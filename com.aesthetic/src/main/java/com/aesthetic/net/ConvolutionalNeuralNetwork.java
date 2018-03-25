@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.spi.LoggerFactory;
 import org.datavec.api.io.filters.BalancedPathFilter;
 import org.datavec.api.io.labels.ParentPathLabelGenerator;
+import org.datavec.api.records.listener.impl.LogRecordListener;
 import org.datavec.api.split.FileSplit;
 import org.datavec.api.split.InputSplit;
 import org.datavec.image.loader.BaseImageLoader;
@@ -41,12 +43,15 @@ import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
+import org.slf4j.Logger;
+
 import static java.lang.Math.toIntExact;
 
 public class ConvolutionalNeuralNetwork {
@@ -55,7 +60,8 @@ public class ConvolutionalNeuralNetwork {
     protected static long seed = 42;
     protected static Random rng = new Random(seed);
     protected static double splitTrainTest = 0.8;
-    static int batchSize = 100;
+    static int batchSize = 128;
+    static int epochscounter = 50;
     
     //private static final long seed = 12345;
 
@@ -65,12 +71,87 @@ public class ConvolutionalNeuralNetwork {
     private static final int width = 30;
     private static final int channels = 3;
     private static final int epochs = 50;
+    
+   private static Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ConvolutionalNeuralNetwork.class);
+	
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
+		
 	}
 	
-	
+	public static void newTry(String path, String path2) throws Exception
+	{
+		 int rngseed = 123;
+		 int outputnum = 2;
+		Random RandNumGen = new Random(rngseed);
+		
+		path = "C:\\Users\\Torben\\Desktop\\Datensatz\\train data";
+		path2 = "C:\\Users\\Torben\\Desktop\\Datensatz\\test data";
+		File trainData = new File(path);
+		File testData = new File(path2);
+		 
+		
+		FileSplit train = new FileSplit(trainData,NativeImageLoader.ALLOWED_FORMATS,RandNumGen);
+		FileSplit test = new FileSplit(testData,NativeImageLoader.ALLOWED_FORMATS,RandNumGen);
+
+		ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
+		ImageRecordReader recordReader = new ImageRecordReader(height,width,channels,labelMaker);
+		
+		recordReader.initialize(train);
+		//recordReader.setListeners(new LogRecordListener());
+		DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+		
+		
+		DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
+		scaler.fit(dataIter);
+		dataIter.setPreProcessor(scaler);
+		
+	/*	for(int i = 1; i < 3;i++)
+		{
+			DataSet ds = dataIter.next();
+			System.out.println(ds);
+			System.out.println(dataIter.getLabels());	
+		}*/
+		
+		LOGGER.info("BUILD MODEL");
+		
+		MultiLayerNetwork network = alexnetModel(2);
+		
+		network.init();
+		
+		network.setListeners(new ScoreIterationListener(10));
+		
+		
+		LOGGER.info("TRAIN MODEL");
+		
+		for(int i = 0;i < epochscounter;i++)
+		{
+			
+			network.fit(dataIter);
+		}
+		
+		recordReader.reset();
+		
+		recordReader.initialize(test);
+		DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader,batchSize,1, outputnum);
+		
+		scaler.fit(testIter);
+		testIter.setPreProcessor(scaler);
+		
+		Evaluation eval = new Evaluation(2);
+		
+		while(testIter.hasNext())
+		{
+			DataSet next = testIter.next();
+			INDArray output = network.output(next.getFeatureMatrix());
+			eval.eval(next.getLabels(), output);
+		}
+		
+		LOGGER.info(eval.stats());
+		
+	}
 	public static void load(String path) throws IOException {
 
 		///*LOADING DATA*
@@ -387,8 +468,7 @@ public class ConvolutionalNeuralNetwork {
 	        
 	}
 
-	 @SuppressWarnings("deprecation")
-	public static MultiLayerNetwork alexnetModel(int numLabels) {
+	 public static MultiLayerNetwork alexnetModel(int numLabels) {
 	        /**
 	         * AlexNet model interpretation based on the original paper ImageNet Classification with Deep Convolutional Neural Networks
 	         * and the imagenetExample code referenced.
@@ -404,10 +484,10 @@ public class ConvolutionalNeuralNetwork {
 		            .dist(new NormalDistribution(0.0, 0.01))
 		            .activation(Activation.RELU)
 		            .updater(new Nesterovs(0.9))
-		            .iterations(3)
+		            .iterations(2)
 		            .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) // normalize to prevent vanishing or exploding gradients
 		            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-		            .learningRate(1e-6)
+		            .learningRate(1e-5)
 		            .biasLearningRate(1e-2*2)
 		            .learningRateDecayPolicy(LearningRatePolicy.Step)
 		            .lrPolicyDecayRate(0.1)
@@ -430,13 +510,15 @@ public class ConvolutionalNeuralNetwork {
 	            .seed(seed)
 	            .weightInit(WeightInit.DISTRIBUTION)
 	            .dist(new NormalDistribution(0.0, 0.01))
+	           // .weightInit(WeightInit.)
 	            .activation(Activation.RELU)
 	            .updater(new Nesterovs(0.9))
-	            .iterations(3)
+	            .iterations(2)
 	            .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) // normalize to prevent vanishing or exploding gradients
 	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 	            .learningRate(1e-3)
 	            .biasLearningRate(1e-2*2)
+	            //.learningRateDecayPolicy(LearningRatePolicy.Step)
 	            .learningRateDecayPolicy(LearningRatePolicy.Step)
 	            .lrPolicyDecayRate(0.1)
 	            .lrPolicySteps(100000)
@@ -455,6 +537,7 @@ public class ConvolutionalNeuralNetwork {
 	            //.layer(7, maxPool("maxpool3", new int[]{3,3}))
 	            .layer(7, fullyConnected("ffn1", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
 	            //.layer(9, fullyConnected("ffn2", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
+	            //.layer(8, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 	            .layer(8, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 	                .name("output")
 	                .nOut(2)

@@ -29,7 +29,7 @@ static final String Delete_BY_PhoTOID = "DELETE FROM flickr.flickr where photoid
 static final String GET_AMOUNT = "SELECT COUNT(PHOTOID) from flickr.flickr";
 static Connection conn;
 static final String WRITE_AVA_SQL = "INSERT INTO flickr.ava(photoid,rating,tags) values(?,?,?)";
-static final String READ_AVA_SQL = "SELECT * FROM flickr.ava";
+static final String READ_AVA_SQL = "SELECT * FROM flickr.ava Limit 25000";
 private static long called;
 static String driver;
 static String pw;

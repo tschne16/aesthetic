@@ -1,18 +1,24 @@
 package com.aesthetic.net;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 
 import org.apache.commons.codec.binary.Base64;
+import org.imgscalr.Scalr;
 
 import com.aesthetic.main.AVAHelper;
 import com.aesthetic.main.DBHelper;
+import com.google.common.io.Files;
 
 public class AVAStructureGeneratior {
 	
@@ -96,8 +102,8 @@ public class AVAStructureGeneratior {
 
 	public static void FolderSystemTwoSplit(String path) throws Exception
 	{
-		
-		path = path + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "images";
+		String org_path = path + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "images";
+		path = path + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "Datensatz" ;
 		
 		/*JFileChooser chooser = new JFileChooser(); 
 	    chooser.setCurrentDirectory(new java.io.File("."));
@@ -119,26 +125,56 @@ public class AVAStructureGeneratior {
 		
 		*/
 		
-		
+		Random rng = new Random();
+
 		List<AVAHelper> all = DBHelper.Load_AVA();
 		String foldername = "";
+		double counter = (double) all.size()*0.8;
+		double current_counter = 0;
 		for(AVAHelper av : all)
 		{
+			current_counter++;
 			if(av.getRating() >= 5)
 			{
-				foldername = "schön";
+				foldername = "beautiful";
 			}
 			else
 			{
-				foldername = "nicht schön";
+				foldername = "not beautiful";
 			}
 			
-			String tmp_path = path + System.getProperty("file.separator") + foldername;
+			
+			//TEST TRAINING DATA SPLIT BEI 80:20
+			String tmp_path;
+			if(current_counter > counter)
+			{
+				 tmp_path = path + System.getProperty("file.separator") + "test data";
+			}
+			else
+			{
+				 tmp_path = path + System.getProperty("file.separator") + "train data";
+			}
+			
+			
+			 tmp_path = tmp_path + System.getProperty("file.separator") + foldername;
 			new File(tmp_path).mkdirs();
 			
 			//check if file exists
-			File f = new File(path + System.getProperty("file.separator") + av.getId() + ".jpg");		
-			f.renameTo(new File(path + System.getProperty("file.separator") + foldername + System.getProperty("file.separator") +  av.getId() + ".jpg"));
+			File f = new File(org_path + System.getProperty("file.separator") + av.getId() + ".jpg");
+			
+			
+			
+			if(f.exists())
+			{
+				
+				//File image = new File("C:\\Users\\Public\\Pictures\\Sample Pictures\\mypicture.jpg")
+				BufferedImage img = ImageIO.read(f);
+				BufferedImage thumbnail = Scalr.resize(img,Scalr.Mode.FIT_EXACT,100,100);
+				ImageIO.write(thumbnail, "jpg", new File(tmp_path +  System.getProperty("file.separator") + av.getId() + ".jpg") );
+			//Files.copy(f, new File(tmp_path +  System.getProperty("file.separator") + av.getId() + ".jpg"));
+			
+			}
+			//f.renameTo(new File(path + System.getProperty("file.separator") + foldername + System.getProperty("file.separator") +  av.getId() + ".jpg"));
 		}
 		
 		

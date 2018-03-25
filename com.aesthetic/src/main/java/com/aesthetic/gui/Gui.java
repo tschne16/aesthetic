@@ -315,8 +315,9 @@ public class Gui extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				
 				try {
-					ConvolutionalNeuralNetwork.load(path);
-				} catch (IOException e1) {
+					//ConvolutionalNeuralNetwork.load(path);
+					ConvolutionalNeuralNetwork.newTry(path, path);
+				} catch ( Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
