@@ -24,7 +24,7 @@ static final String WRITE_OBJECT_SQL = "INSERT INTO flickr.flickr(photoid, views
 static final String READ_ALLPHOTO_IDS_SQL = "SELECT photoid FROM flickr.flickr;";
 static final String Update_OBJECT_SQL = "UPDATE flickr.flickr set phototitel =  ?, tags = ? where photoid = ?";
 static final String LOAD_DATA_INFO = "SELECT photoid,url,phototitel,favs,views,CONVERT(base64 USING utf8) as base64 FROM flickr.flickr where favs >= ?";
-static final String LOAD_DATA_INFO_LAZY = "SELECT photoid,favs,views,pictureformat FROM flickr.flickr where views >= ?";
+static final String LOAD_DATA_INFO_LAZY = "SELECT photoid,favs,views,pictureformat FROM flickr.flickr where views >= ? and favs > 0 order by photoid LIMIT 100000";
 static final String Delete_BY_PhoTOID = "DELETE FROM flickr.flickr where photoid = ?";
 static final String GET_AMOUNT = "SELECT COUNT(PHOTOID) from flickr.flickr";
 static Connection conn;

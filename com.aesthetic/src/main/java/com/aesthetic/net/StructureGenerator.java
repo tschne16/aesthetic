@@ -32,11 +32,13 @@ import org.apache.commons.codec.binary.Base64;
 public class StructureGenerator extends SwingWorker<Void, Integer> {
 	private static String path;
 	private static final Logger LOGGER = Logger.getLogger( DBHelper.class.getName() );
-
+	private static double count_all = 0;
+	private static double counter = 0;
 	@Override
 	protected Void doInBackground() throws Exception
 	{
 		
+		count_all = 100000;
 		
 		///HIer wurde das Base64 noch nicht geladen --> da zu groß
 		//Nachträglich als Eager fetch laden in 500ter schritten um DB Last zu reduzieren
@@ -79,11 +81,36 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 		
 		for(Info inf : ids)
 		{
-		
+			counter++;
+			
 			LOGGER.log(Level.INFO,Boolean.toString(dic.containsKey(inf.getPhotoid())));
 		
 			base64 = dic.get(inf.getPhotoid());
 			double res = (double) inf.getFavs()/ (double) inf.getViews();
+			
+			String parentfolder;
+			parentfolder = "Train Data";
+			
+			if((count_all*0.8) < counter)
+			{
+				parentfolder = "Test Data";
+			}
+			
+			
+			
+			String folder;
+			
+			if(res >0.0223)
+			{
+				folder = "aesthetic";
+			}
+			else
+			{
+				folder = "not aesthetic";
+			}
+			
+			
+			
 			
 			LOGGER.log(Level.INFO, Long.toString(inf.getFavs()));
 			LOGGER.log(Level.INFO, Long.toString(inf.getViews()));
@@ -97,8 +124,11 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 			favsperview = Math.round(res);
 			//String s_favsperview = df.format(res).replace('.', ',');
 			String s_favsperview = Double.toString(rounded).replace('.', ',');
-			String tmp_path = path + System.getProperty("file.separator") + s_favsperview;
+			//String tmp_path = path + System.getProperty("file.separator") + s_favsperview;
 			 
+			String tmp_path = path + System.getProperty("file.separator") + parentfolder + System.getProperty("file.separator") + folder;
+			
+			
 			
 			if(Base64.isBase64(base64) == true && base64 != "")
 			{

@@ -4,7 +4,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.io.FilenameUtils;
@@ -60,8 +65,8 @@ public class ConvolutionalNeuralNetwork {
     protected static long seed = 42;
     protected static Random rng = new Random(seed);
     protected static double splitTrainTest = 0.8;
-    static int batchSize = 128;
-    static int epochscounter = 50;
+    static int batchSize = 	20;
+    static int epochscounter = 2;
     
     //private static final long seed = 12345;
 
@@ -87,8 +92,8 @@ public class ConvolutionalNeuralNetwork {
 		 int outputnum = 2;
 		Random RandNumGen = new Random(rngseed);
 		
-		path = "C:\\Users\\Torben\\Desktop\\Datensatz\\train data";
-		path2 = "C:\\Users\\Torben\\Desktop\\Datensatz\\test data";
+		path = "C:\\Users\\Torben\\Desktop\\Small Dataset\\train data";
+		path2 = "C:\\Users\\Torben\\Desktop\\Small Dataset\\test data";
 		File trainData = new File(path);
 		File testData = new File(path2);
 		 
@@ -117,19 +122,45 @@ public class ConvolutionalNeuralNetwork {
 		
 		LOGGER.info("BUILD MODEL");
 		
-		MultiLayerNetwork network = alexnetModel(2);
-		
+		//MultiLayerNetwork network = alexnetModel(2);
+		//MultiLayerNetwork network = newNetwork();
+		MultiLayerNetwork network = own();
 		network.init();
 		
+		UIServer uiServer = UIServer.getInstance();
+	    StatsStorage statsStorage = new InMemoryStatsStorage();  
+	    int listenerFrequency = 1;
+	    network.setListeners(new StatsListener(statsStorage, listenerFrequency));
+	    uiServer.attach(statsStorage);
+	    
 		network.setListeners(new ScoreIterationListener(10));
+		List<IterationListener> listeners = new ArrayList<>();
+		listeners.add(new ScoreIterationListener(10));
+		listeners.add(new StatsListener(statsStorage, listenerFrequency));
+	
 		
+		network.setListeners(listeners);
 		
+			
 		LOGGER.info("TRAIN MODEL");
-		
+		dataIter.next().shuffle();
 		for(int i = 0;i < epochscounter;i++)
 		{
+			while(dataIter.hasNext())
+			{
+			//dataIter.next();
+			//network.fit(dataIter);
+			DataSet testSet = dataIter.next();
+			testSet.shuffle();	
+			network.fit(testSet);
 			
-			network.fit(dataIter);
+		//	System.out.println(testSet.getLabels().sum(0));
+			
+			
+			}
+			
+			dataIter.reset();
+			LOGGER.info("EPOCHE Completed : " + i);
 		}
 		
 		recordReader.reset();
@@ -139,19 +170,75 @@ public class ConvolutionalNeuralNetwork {
 		
 		scaler.fit(testIter);
 		testIter.setPreProcessor(scaler);
-		
 		Evaluation eval = new Evaluation(2);
 		
 		while(testIter.hasNext())
 		{
 			DataSet next = testIter.next();
+			next.shuffle();
 			INDArray output = network.output(next.getFeatureMatrix());
 			eval.eval(next.getLabels(), output);
 		}
 		
 		LOGGER.info(eval.stats());
+		LOGGER.info(Double.toString(eval.accuracy()));
+	}
+	
+	public static MultiLayerNetwork newNetwork()
+	{
+	    Map<Integer, Double> lrSchedule = new HashMap<>();
+	    lrSchedule.put(0, 1e-5); // iteration #, learning rate
+	    lrSchedule.put(200, 0.05);
+	    lrSchedule.put(600, 0.028);
+	    lrSchedule.put(800, 0.0060);
+	    lrSchedule.put(1000, 0.001);
+	    
+	    MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+	            .seed(seed)
+	            .iterations(1)
+	            .regularization(true).l2(0.0005)
+	            .learningRate(.01)
+	            .learningRateDecayPolicy(LearningRatePolicy.Schedule)
+	            .learningRateSchedule(lrSchedule) // overrides the rate set in learningRate
+	            .weightInit(WeightInit.DISTRIBUTION)
+	            .dist(new NormalDistribution(0.0, 0.01))
+	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+	            .updater(Updater.NESTEROVS)
+	            .list()
+	            .layer(0, new ConvolutionLayer.Builder(5, 5)
+	                .nIn(channels)
+	                .stride(1, 1)
+	                .nOut(20)
+	                .activation(Activation.IDENTITY)
+	                .build())
+	            .layer(1, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
+	                .kernelSize(2, 2)
+	                .stride(2, 2)
+	                .build())
+	            .layer(2, new ConvolutionLayer.Builder(5, 5)
+	                .stride(1, 1) // nIn need not specified in later layers
+	                .nOut(50)
+	                .activation(Activation.IDENTITY)
+	                .build())
+	            .layer(3, new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX)
+	                .kernelSize(2, 2)
+	                .stride(2, 2)
+	                .build())
+	            .layer(4, new DenseLayer.Builder().activation(Activation.RELU)
+	                .nOut(500).build())
+	            .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+	                .nOut(2)
+	                .activation(Activation.SOFTMAX)
+	                .build())
+	            .setInputType(InputType.convolutionalFlat(30, 30, 3)) // InputType.convolutional for normal image
+	            .backprop(true).pretrain(false).build();
+		
+		
+		return new MultiLayerNetwork(conf);
 		
 	}
+	
+	
 	public static void load(String path) throws IOException {
 
 		///*LOADING DATA*
@@ -487,13 +574,13 @@ public class ConvolutionalNeuralNetwork {
 		            .iterations(2)
 		            .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) // normalize to prevent vanishing or exploding gradients
 		            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-		            .learningRate(1e-5)
+		            .learningRate(1e-4)
 		            .biasLearningRate(1e-2*2)
 		            .learningRateDecayPolicy(LearningRatePolicy.Step)
 		            .lrPolicyDecayRate(0.1)
 		            .lrPolicySteps(100000)
 		            .regularization(true)
-		            .l2(5 * 1e-4)
+		            .l2(1e-4)
 		            .list();
 	        
 	        
@@ -508,15 +595,18 @@ public class ConvolutionalNeuralNetwork {
 	        
 	        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
 	            .seed(seed)
-	            .weightInit(WeightInit.DISTRIBUTION)
-	            .dist(new NormalDistribution(0.0, 0.01))
+	            .weightInit(WeightInit.XAVIER)
+	           // .weightInit(WeightInit.DISTRIBUTION)
+	           // .dist(new NormalDistribution(0.0, 0.01))
 	           // .weightInit(WeightInit.)
-	            .activation(Activation.RELU)
-	            .updater(new Nesterovs(0.9))
-	            .iterations(2)
-	            .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) // normalize to prevent vanishing or exploding gradients
+	            //.activation(Activation.RELU)
+	            //.updater(new Nesterovs(0.9))
+	            .updater(Updater.NESTEROVS)
+	            .iterations(1)
+	            //.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) // normalize to prevent vanishing or exploding gradients
+	            .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
 	            .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-	            .learningRate(1e-3)
+	            .learningRate(1e-5)
 	            .biasLearningRate(1e-2*2)
 	            //.learningRateDecayPolicy(LearningRatePolicy.Step)
 	            .learningRateDecayPolicy(LearningRatePolicy.Step)
@@ -532,13 +622,13 @@ public class ConvolutionalNeuralNetwork {
 	            .layer(4, new LocalResponseNormalization.Builder().name("lrn2").build())
 	            .layer(5, maxPool("maxpool2", new int[]{3,3}))
 	            .layer(6,conv3x3("cnn3", 384, 0))
-	           // .layer(6,conv3x3("cnn4", 384, nonZeroBias))
-	           // .layer(7,conv3x3("cnn5", 256, nonZeroBias))
-	            //.layer(7, maxPool("maxpool3", new int[]{3,3}))
-	            .layer(7, fullyConnected("ffn1", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
+	            .layer(7,conv3x3("cnn4", 384, nonZeroBias))
+	            .layer(8,conv3x3("cnn5", 256, nonZeroBias))
+	            //.layer(9, maxPool("maxpool3", new int[]{3,3}))
+	            .layer(9, fullyConnected("ffn1", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
 	            //.layer(9, fullyConnected("ffn2", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
 	            //.layer(8, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-	            .layer(8, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+	            .layer(10, new OutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
 	                .name("output")
 	                .nOut(2)
 	                .activation(Activation.SOFTMAX)
@@ -553,6 +643,70 @@ public class ConvolutionalNeuralNetwork {
 	        return new MultiLayerNetwork(conf);
 
 	    }
+	 
+	 	private static MultiLayerNetwork own()
+	 	{
+	        double nonZeroBias = 1;
+	        double dropOut = 0.5;
+	        
+	 		 MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+	 	            .seed(seed)
+	 	            //.weightInit(WeightInit.XAVIER)
+	 	            .weightInit(WeightInit.DISTRIBUTION)
+	 	            .dist(new NormalDistribution(0.0, 0.01))
+	 	           // .weightInit(WeightInit.)
+	 	            //.activation(Activation.RELU)
+	 	            //.updater(new Nesterovs(0.9))
+	 	            //.updater(Updater.NESTEROVS)
+	 	            //.updater(Updater.
+	 	            .iterations(1)
+	 	           // .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) // normalize to prevent vanishing or exploding gradients
+	 	            //.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
+	 	            //.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+	 	           .learningRate(0.1)
+	 	          //  .biasLearningRate(1e-2*2)
+	 	          // .learningRateDecayPolicy(LearningRatePolicy.Step)
+	 	          //.learningRateDecayPolicy(LearningRatePolicy.Step)
+	 	          //  .lrPolicyDecayRate(0.1)
+	 	          //  .lrPolicySteps(100000)
+	 	          //.regularization(true)
+	 	          // .l2(5 * 1e-4)
+	 	            .list()	        
+	 	           .layer(0, convInit("cnn1", channels, 80, new int[]{10, 10}, new int[]{4, 4}, new int[]{3, 3}, 0))
+		            .layer(1, new LocalResponseNormalization.Builder().name("lrn1").build())
+	 	            .layer(2, maxPool("maxpool1", new int[]{3,3}))
+	 	            .layer(3, conv5x5("cnn2", 256, new int[] {1,1}, new int[] {2,2}, nonZeroBias))
+	 	             .layer(4, new LocalResponseNormalization.Builder().name("lrn2").build())
+	 	            .layer(5, maxPool("maxpool2", new int[]{3,3}))
+	 	            .layer(6,conv3x3("cnn3", 384, 0))
+	 	            .layer(7,conv3x3("cnn4", 384, nonZeroBias))
+	 	            .layer(8,conv3x3("cnn5", 256, nonZeroBias))
+	 	           .layer(9, maxPool("maxpool3", new int[]{1,1}))
+	 	           .layer(10,conv3x3("cnn6", 256, nonZeroBias))
+	 	            .layer(11, maxPool("maxpool3", new int[]{1,1}))
+	 	           .layer(12,conv3x3("cnn7", 256, nonZeroBias))
+	 	          .layer(13, maxPool("maxpool4", new int[]{1,1}))
+	 	            .layer(14, fullyConnected("ffn1", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
+	 	           .layer(15, fullyConnected("ffn2", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
+	 	            //.layer(8, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+	 	            .layer(16, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+	 	                .name("output")
+	 	                .nOut(2)
+	 	                .activation(Activation.SOFTMAX)
+	 	                .build())
+	 	            .backprop(true)
+	 	            .pretrain(false)
+	 	            .setInputType(InputType.convolutional(height, width, channels))
+	 	            .build();
+	 		
+	 		
+	 		
+	 		
+	 		
+	 		
+	 		return new MultiLayerNetwork(conf);
+	 	}
+	 
 	 
 	    private static ConvolutionLayer convInit(String name, int in, int out, int[] kernel, int[] stride, int[] pad, double bias) {
 	        return new ConvolutionLayer.Builder(kernel, stride, pad).name(name).nIn(in).nOut(out).biasInit(bias).build();
