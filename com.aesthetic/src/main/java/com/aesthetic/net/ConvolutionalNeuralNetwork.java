@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.spi.LoggerFactory;
@@ -19,6 +20,7 @@ import org.datavec.api.io.labels.ParentPathLabelGenerator;
 import org.datavec.api.records.listener.impl.LogRecordListener;
 import org.datavec.api.split.FileSplit;
 import org.datavec.api.split.InputSplit;
+import org.datavec.api.transform.condition.column.NaNColumnCondition;
 import org.datavec.image.loader.BaseImageLoader;
 import org.datavec.image.loader.NativeImageLoader;
 import org.datavec.image.recordreader.ImageRecordReader;
@@ -28,8 +30,18 @@ import org.datavec.image.transform.WarpImageTransform;
 import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.MultipleEpochsIterator;
+import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
+import org.deeplearning4j.earlystopping.EarlyStoppingModelSaver;
+import org.deeplearning4j.earlystopping.EarlyStoppingResult;
+import org.deeplearning4j.earlystopping.saver.LocalFileModelSaver;
+import org.deeplearning4j.earlystopping.scorecalc.DataSetLossCalculator;
+import org.deeplearning4j.earlystopping.termination.InvalidScoreIterationTerminationCondition;
+import org.deeplearning4j.earlystopping.termination.MaxEpochsTerminationCondition;
+import org.deeplearning4j.earlystopping.termination.MaxTimeIterationTerminationCondition;
+import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
+import org.deeplearning4j.nn.api.Model;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
@@ -48,6 +60,7 @@ import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.activations.IActivation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -65,7 +78,7 @@ public class ConvolutionalNeuralNetwork {
     protected static long seed = 42;
     protected static Random rng = new Random(seed);
     protected static double splitTrainTest = 0.8;
-    static int batchSize = 	20;
+    static int batchSize = 	32;
     static int epochscounter = 2;
     
     //private static final long seed = 12345;
@@ -76,7 +89,7 @@ public class ConvolutionalNeuralNetwork {
     private static final int width = 30;
     private static final int channels = 3;
     private static final int epochs = 50;
-    
+    private static final String outputtxt_file ="C:\\Users\\Torben\\Desktop\\Small Dataset\\";
    private static Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ConvolutionalNeuralNetwork.class);
 	
 	
@@ -91,9 +104,9 @@ public class ConvolutionalNeuralNetwork {
 		 int rngseed = 123;
 		 int outputnum = 2;
 		Random RandNumGen = new Random(rngseed);
-		
-		path = "C:\\Users\\Torben\\Desktop\\Small Dataset\\train data";
-		path2 = "C:\\Users\\Torben\\Desktop\\Small Dataset\\test data";
+		String path_model = "C:\\Users\\Torben\\Desktop\\Small Dataset\\Models\\";
+		path = "C:\\Users\\Torben\\Desktop\\new small dataset\\train data";
+		path2 = "C:\\Users\\Torben\\Desktop\\new small dataset\\test data";
 		File trainData = new File(path);
 		File testData = new File(path2);
 		 
@@ -101,18 +114,7 @@ public class ConvolutionalNeuralNetwork {
 		FileSplit train = new FileSplit(trainData,NativeImageLoader.ALLOWED_FORMATS,RandNumGen);
 		FileSplit test = new FileSplit(testData,NativeImageLoader.ALLOWED_FORMATS,RandNumGen);
 
-		ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
-		ImageRecordReader recordReader = new ImageRecordReader(height,width,channels,labelMaker);
-		
-		recordReader.initialize(train);
-		//recordReader.setListeners(new LogRecordListener());
-		DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
-		
-		
-		DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
-		scaler.fit(dataIter);
-		dataIter.setPreProcessor(scaler);
-		
+
 	/*	for(int i = 1; i < 3;i++)
 		{
 			DataSet ds = dataIter.next();
@@ -124,26 +126,146 @@ public class ConvolutionalNeuralNetwork {
 		
 		//MultiLayerNetwork network = alexnetModel(2);
 		//MultiLayerNetwork network = newNetwork();
-		MultiLayerNetwork network = own();
-		network.init();
+	 
+		File dirFile = new File(path_model);
 		
-		UIServer uiServer = UIServer.getInstance();
-	    StatsStorage statsStorage = new InMemoryStatsStorage();  
-	    int listenerFrequency = 1;
-	    network.setListeners(new StatsListener(statsStorage, listenerFrequency));
-	    uiServer.attach(statsStorage);
-	    
-		network.setListeners(new ScoreIterationListener(10));
-		List<IterationListener> listeners = new ArrayList<>();
-		listeners.add(new ScoreIterationListener(10));
-		listeners.add(new StatsListener(statsStorage, listenerFrequency));
-	
+		dirFile.mkdir();
+		 
 		
-		network.setListeners(listeners);
+		
+
+		///TRY Different Stuff
+		WeightInit[] actv = new WeightInit[2];
+		actv[0] = WeightInit.DISTRIBUTION;
+		actv[1] = WeightInit.XAVIER;
+		
+	for(int z =0; z <3; z++)	
+	{
+		batchSize = 15 + 10*z;
+		for(int x=0; x < actv.length;x++)
+		{
+			WeightInit weightinit = actv[x];
+			for(int i = 3; i < 5; i++)
+			{
+				ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
+				ImageRecordReader recordReader = new ImageRecordReader(height,width,channels,labelMaker);
+				
+				recordReader.initialize(train);
+				//recordReader.setListeners(new LogRecordListener());
+				DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+				DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
+				scaler.fit(dataIter);
+				dataIter.setPreProcessor(scaler);
+				
+				ParentPathLabelGenerator labelMaker2 = new ParentPathLabelGenerator();
+				ImageRecordReader recordReader_Test = new ImageRecordReader(height,width,channels,labelMaker2);
+				recordReader_Test.initialize(test);
+				DataNormalization scaler2 = new ImagePreProcessingScaler(0, 1);
+				DataSetIterator dataIter_test = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
+				
+				scaler2.fit(dataIter_test);
+				dataIter_test.setPreProcessor(scaler2);
+			MultiLayerNetwork network = own(i,weightinit);
+			
+			network.init();
+			
+			UIServer uiServer = UIServer.getInstance();
+		    StatsStorage statsStorage = new InMemoryStatsStorage();  
+		    int listenerFrequency = 1;
+		    network.setListeners(new StatsListener(statsStorage, listenerFrequency));
+		    uiServer.attach(statsStorage);
+		    
+			network.setListeners(new ScoreIterationListener(10));
+			List<IterationListener> listeners = new ArrayList<>();
+			listeners.add(new ScoreIterationListener(10));
+			listeners.add(new StatsListener(statsStorage, listenerFrequency));
 		
 			
-		LOGGER.info("TRAIN MODEL");
-		dataIter.next().shuffle();
+			network.setListeners(listeners);
+		//	EarlyStoppingModelSaver saver = new LocalFileModelSaver(path_model);
+	       
+			EarlyStoppingConfiguration esConf = new EarlyStoppingConfiguration.Builder()
+	                .epochTerminationConditions(new MaxEpochsTerminationCondition(10)) //Max of 50 epochs
+	                .evaluateEveryNEpochs(1)
+	                .iterationTerminationConditions(new MaxTimeIterationTerminationCondition(20, TimeUnit.MINUTES))
+	                .iterationTerminationConditions(new InvalidScoreIterationTerminationCondition() )//Max of 20 minutes
+	                .scoreCalculator(new DataSetLossCalculator(dataIter_test, true))     //Calculate test set score
+	                .saveLastModel(false)
+	               // .modelSaver(saver)
+	                .build();
+			
+			
+	       // MultiLayerConfiguration configuration = own();
+	        
+	        
+	       // new EarlyStoppingTrainer()
+	        EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(esConf,network,dataIter);
+	        
+	        EarlyStoppingResult result = trainer.fit();
+	        
+	        
+	        // DAS MUSS IN EINE TXT DATEI
+	        System.out.println("Termination reason: " + result.getTerminationReason());
+	        System.out.println("Termination details: " + result.getTerminationDetails());
+	        System.out.println("Total epochs: " + result.getTotalEpochs());
+	        System.out.println("Best epoch number: " + result.getBestModelEpoch());
+	        System.out.println("Score at best epoch: " + result.getBestModelScore());
+	        
+	        
+	        
+	        //EVALUATION
+	        
+	        Evaluation eval = new Evaluation(2);
+	        recordReader.reset();
+			
+			recordReader.initialize(test);
+			DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader,batchSize,1, outputnum);
+			
+			scaler.fit(testIter);
+			testIter.setPreProcessor(scaler);
+			
+			while(testIter.hasNext())
+			{
+				DataSet next = testIter.next();
+				next.shuffle();
+				INDArray output = network.output(next.getFeatureMatrix());
+				eval.eval(next.getLabels(), output);
+			}
+			
+			LOGGER.info(eval.stats());
+			LOGGER.info(Double.toString(eval.accuracy()));
+			
+			
+			try {
+	        uiServer.stop();	   
+	        uiServer.detach(statsStorage);
+	        uiServer = null;
+	        		statsStorage.close();
+			}
+			catch(Exception e)
+			{
+				LOGGER.info(e.getMessage());
+			}
+	        
+	        try {
+	        Model m = result.getBestModel();
+	        ModelSerializer.writeModel(m, path_model, true);
+	        
+	        ///HIER AUCH DAS GANZE NETZ ABSPEICHERN
+	        }
+	        catch(Exception e)
+	        {
+	        	LOGGER.info("NOT SAVED : " + e.getMessage());
+	        }
+	        
+	        network = null;
+			LOGGER.info("TRAIN MODEL");
+			
+			}
+		}
+		
+	}
+		/*dataIter.next().shuffle();
 		for(int i = 0;i < epochscounter;i++)
 		{
 			while(dataIter.hasNext())
@@ -181,7 +303,7 @@ public class ConvolutionalNeuralNetwork {
 		}
 		
 		LOGGER.info(eval.stats());
-		LOGGER.info(Double.toString(eval.accuracy()));
+		LOGGER.info(Double.toString(eval.accuracy()));*/
 	}
 	
 	public static MultiLayerNetwork newNetwork()
@@ -644,17 +766,47 @@ public class ConvolutionalNeuralNetwork {
 
 	    }
 	 
-	 	private static MultiLayerNetwork own()
+	 	private static MultiLayerNetwork own(int amount_conv_layer,WeightInit weight)
 	 	{
 	        double nonZeroBias = 1;
 	        double dropOut = 0.5;
 	        
-	 		 MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+	        //ZU probierende Learningrates
+		    Map<Integer, Double> lrSchedule = new HashMap<>();
+		    lrSchedule.put(0, 0.0001); // iteration #, learning rate
+		    lrSchedule.put(150, 0.0001);
+		    lrSchedule.put(300, 0.0001);
+		    lrSchedule.put(550, 0.0001);
+		    lrSchedule.put(800, 0.00001);
+		   
+		    NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
+		    builder.seed(seed);
+		    builder.weightInit(weight);
+		   // builder.setConvolutionMode(ConvolutionMode.Same);
+		   // builder.setMiniBatch(miniBatch);
+		    builder.setUseRegularization(true);
+		   
+		    if(weight == WeightInit.DISTRIBUTION)
+		    {
+		    	builder.dist(new NormalDistribution(0.0, 0.01));
+		    }
+		    	builder.iterations(1);
+		    	builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
+		    	builder.learningRateSchedule(lrSchedule);
+		    	builder.updater(Updater.NESTEROVS);
+		    	builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
+ 	            //builder.l2(1e-3);
+ 	            builder.dropOut(0.5);
+		    	//
+		    ListBuilder listbuilder = builder.list();
+		    
+		    /*ListBuilder listbuilder  = new NeuralNetConfiguration.Builder()
 	 	            .seed(seed)
 	 	            //.weightInit(WeightInit.XAVIER)
-	 	            .weightInit(WeightInit.DISTRIBUTION)
-	 	            .dist(new NormalDistribution(0.0, 0.01))
-	 	           // .weightInit(WeightInit.)
+	 	            //.weightInit(WeightInit.RELU)
+	 	           .weightInit(weight)
+	 	           .dist(new NormalDistribution(0.0, 0.01))
+	 	        
 	 	            //.activation(Activation.RELU)
 	 	            //.updater(new Nesterovs(0.9))
 	 	            //.updater(Updater.NESTEROVS)
@@ -663,7 +815,9 @@ public class ConvolutionalNeuralNetwork {
 	 	           // .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) // normalize to prevent vanishing or exploding gradients
 	 	            //.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
 	 	            //.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-	 	           .learningRate(0.1)
+	 	           //.learningRate(0.01)
+	 	           .learningRateDecayPolicy(LearningRatePolicy.Schedule)
+		            .learningRateSchedule(lrSchedule)
 	 	          //  .biasLearningRate(1e-2*2)
 	 	          // .learningRateDecayPolicy(LearningRatePolicy.Step)
 	 	          //.learningRateDecayPolicy(LearningRatePolicy.Step)
@@ -671,8 +825,62 @@ public class ConvolutionalNeuralNetwork {
 	 	          //  .lrPolicySteps(100000)
 	 	          //.regularization(true)
 	 	          // .l2(5 * 1e-4)
-	 	            .list()	        
-	 	           .layer(0, convInit("cnn1", channels, 80, new int[]{10, 10}, new int[]{4, 4}, new int[]{3, 3}, 0))
+	 	            .list();*/
+	        listbuilder.layer(0, convInit("cnn1", channels, 64, new int[]{11, 11}, new int[]{3, 3}, new int[]{3, 3}, 0));
+	        listbuilder.layer(1, new LocalResponseNormalization.Builder().name("lrn1").build());
+	        listbuilder.layer(2, maxPool("maxpool1", new int[]{3,3}));
+	        int counter = 0;
+	        
+	        for(int i = 1; i<= amount_conv_layer;i++)
+	        	{
+	        	//listbuilder.layer(i+2, conv3x3("cnn"+i+2, 256, new int[] {1,1}, new int[] {2,2}, nonZeroBias));
+	        	listbuilder.layer(i+2,conv3x3("cnn"+i+2, 64, nonZeroBias));
+	        	listbuilder.layer(i+3, new LocalResponseNormalization.Builder().name("lrn2"+i+3).build());
+	        	listbuilder.layer(i+4, maxPool("maxpool"+ i+4, new int[]{3,3}));			
+	        	counter = i+5;
+	        	}
+	        //4096
+	       listbuilder.layer(counter, fullyConnected("ffn" + counter, 1000, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+	       listbuilder.layer(counter+1, fullyConnected("ffn" + counter+1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+		      
+	       listbuilder.layer(counter+2, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+	                .name("output")
+	                .nOut(2)
+	                .activation(Activation.SIGMOID)
+	                .build());
+	       listbuilder.backprop(true);
+	       listbuilder.pretrain(false);
+	       listbuilder.setInputType(InputType.convolutional(height, width, channels));
+	       MultiLayerConfiguration conf_test = listbuilder .build();
+	       
+	       
+	       return new MultiLayerNetwork(conf_test);
+	      /* 
+	 		 MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+	 	            .seed(seed)
+	 	            //.weightInit(WeightInit.XAVIER)
+	 	            //.weightInit(WeightInit.RELU)
+	 	           .weightInit(WeightInit.DISTRIBUTION)
+	 	            .dist(new NormalDistribution(0.0, 0.01))
+	 	        
+	 	            //.activation(Activation.RELU)
+	 	            //.updater(new Nesterovs(0.9))
+	 	            //.updater(Updater.NESTEROVS)
+	 	            //.updater(Updater.
+	 	            .iterations(1)
+	 	           // .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) // normalize to prevent vanishing or exploding gradients
+	 	            //.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
+	 	            //.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+	 	           .learningRate(0.01)
+	 	          //  .biasLearningRate(1e-2*2)
+	 	          // .learningRateDecayPolicy(LearningRatePolicy.Step)
+	 	          //.learningRateDecayPolicy(LearningRatePolicy.Step)
+	 	          //  .lrPolicyDecayRate(0.1)
+	 	          //  .lrPolicySteps(100000)
+	 	          //.regularization(true)
+	 	          // .l2(5 * 1e-4)
+	 	            .list()	            
+	 	           .layer(0, convInit("cnn1", channels, 100, new int[]{11, 11}, new int[]{3, 3}, new int[]{3, 3}, 0))
 		            .layer(1, new LocalResponseNormalization.Builder().name("lrn1").build())
 	 	            .layer(2, maxPool("maxpool1", new int[]{3,3}))
 	 	            .layer(3, conv5x5("cnn2", 256, new int[] {1,1}, new int[] {2,2}, nonZeroBias))
@@ -685,7 +893,7 @@ public class ConvolutionalNeuralNetwork {
 	 	           .layer(10,conv3x3("cnn6", 256, nonZeroBias))
 	 	            .layer(11, maxPool("maxpool3", new int[]{1,1}))
 	 	           .layer(12,conv3x3("cnn7", 256, nonZeroBias))
-	 	          .layer(13, maxPool("maxpool4", new int[]{1,1}))
+	 	           .layer(13, maxPool("maxpool4", new int[]{1,1}))
 	 	            .layer(14, fullyConnected("ffn1", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
 	 	           .layer(15, fullyConnected("ffn2", 4096, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)))
 	 	            //.layer(8, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
@@ -702,9 +910,11 @@ public class ConvolutionalNeuralNetwork {
 	 		
 	 		
 	 		
+	 		MultiLayerNetwork result = new MultiLayerNetwork(conf);
 	 		
 	 		
-	 		return new MultiLayerNetwork(conf);
+	 		
+	 		return result;*/
 	 	}
 	 
 	 
@@ -713,7 +923,8 @@ public class ConvolutionalNeuralNetwork {
 	    }
 
 	    private static ConvolutionLayer conv3x3(String name, int out, double bias) {
-	        return new ConvolutionLayer.Builder(new int[]{3,3}, new int[] {1,1}, new int[] {1,1}).name(name).nOut(out).biasInit(bias).build();
+	       //HIER RELU EINGEFÜGT --> notfalls löschen
+	    	return new ConvolutionLayer.Builder(new int[]{3,3}, new int[] {1,1}, new int[] {1,1}).name(name).nOut(out).biasInit(bias).nIn(64).build();
 	    }
 
 	    private static ConvolutionLayer conv5x5(String name, int out, int[] stride, int[] pad, double bias) {

@@ -43,24 +43,26 @@ public class AVAStructureGeneratior {
 		br.close();
 		
 		
-		
-		
-		
-		
-		
-		
-
         br = new BufferedReader(new FileReader(path + "\\AVA.txt"));
 		
 		int counter = 0;
+		
+		
         while ((line = br.readLine()) != null) {
 
         	
         	counter++;
         	
+        	
+        	///TEMPORÄRE SPERRE 
         	if(counter >= 0)
         		break;
         	
+        	
+        	
+        	
+        	if(counter > 9998)
+        	{
         	String[] parts = line.split(" ");
         	//String part1 = parts[0]; // 004
         	String photoid = parts[1]; // 034556
@@ -82,9 +84,6 @@ public class AVAStructureGeneratior {
         	
         		String tags = map.get(tag1) + ";" + map.get(tag2);
 
-        	
-        	
-        	
         	try
         	{
         	DBHelper.insertIntoAva(photoid, val,tags);
@@ -95,6 +94,7 @@ public class AVAStructureGeneratior {
         	}
         	
             }
+        }
         
         	FolderSystemTwoSplit(path);
 	}
@@ -103,7 +103,7 @@ public class AVAStructureGeneratior {
 	public static void FolderSystemTwoSplit(String path) throws Exception
 	{
 		String org_path = path + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "images";
-		path = path + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "Datensatz" ;
+		path = path + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "Datensatz RAPID" ;
 		
 		/*JFileChooser chooser = new JFileChooser(); 
 	    chooser.setCurrentDirectory(new java.io.File("."));
@@ -169,7 +169,7 @@ public class AVAStructureGeneratior {
 				
 				//File image = new File("C:\\Users\\Public\\Pictures\\Sample Pictures\\mypicture.jpg")
 				BufferedImage img = ImageIO.read(f);
-				BufferedImage thumbnail = Scalr.resize(img,Scalr.Mode.FIT_EXACT,100,100);
+				BufferedImage thumbnail = Scalr.resize(img,Scalr.Mode.FIT_EXACT,224,224);
 				ImageIO.write(thumbnail, "jpg", new File(tmp_path +  System.getProperty("file.separator") + av.getId() + ".jpg") );
 			//Files.copy(f, new File(tmp_path +  System.getProperty("file.separator") + av.getId() + ".jpg"));
 			

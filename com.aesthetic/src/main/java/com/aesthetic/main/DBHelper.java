@@ -30,6 +30,7 @@ static final String GET_AMOUNT = "SELECT COUNT(PHOTOID) from flickr.flickr";
 static Connection conn;
 static final String WRITE_AVA_SQL = "INSERT INTO flickr.ava(photoid,rating,tags) values(?,?,?)";
 static final String READ_AVA_SQL = "SELECT * FROM flickr.ava Limit 25000";
+static final String READ_AVA_SQL_RAPID = "select * from flickr.ava where rating < 4.5 or rating >= 5.5 Limit 13200";
 private static long called;
 static String driver;
 static String pw;
@@ -51,7 +52,7 @@ public static List<AVAHelper> Load_AVA() throws Exception
 {
 	
 	getConnection();
-	PreparedStatement pstmt = conn.prepareStatement(READ_AVA_SQL);
+	PreparedStatement pstmt = conn.prepareStatement(READ_AVA_SQL_RAPID);
 	
 	pstmt.execute();
     ResultSet rstest = pstmt.getResultSet();
