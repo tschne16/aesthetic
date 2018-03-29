@@ -15,28 +15,57 @@ public class CreateImage {
 	{
 		
 		Random rand = new Random();
-		for(int i = 1;i<=500;i++)
+		
+		
+	for(int x=0;x<2;x++)	
+	{
+		String foldername = "black";
+	
+		if(x >0)
 		{
-		BufferedImage xyz = new BufferedImage(224,224,BufferedImage.TYPE_INT_ARGB);
+			foldername = "white";
+		}
+		
+		
+		for(int i = 1;i<=300;i++)
+		{
+		BufferedImage xyz = new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphic = xyz.createGraphics();
 		
 		float r = rand.nextFloat();
 		float g = rand.nextFloat();
 		float b = rand.nextFloat();
-		
-		
 		Color randomColor = new Color(r, g, b);
-		graphic.setColor(randomColor);
-		graphic.fillRect(0, 0, 224, 224);
-		graphic.drawImage(xyz,0,0,224,224,null);
+		if(x== 0)
+		{
+			randomColor = Color.black;
+			
+			r = 0;
+			g = 0;
+			b = 0;
+		}
+		else
+		{
+			randomColor = Color.white;
+			r = 254;
+			g = 254;
+			b = 254;
+		}
 		
-		try{ImageIO.write(xyz,"jpg",new File("C:\\Users\\Torben\\Desktop\\New Small Dataset\\test data\\not beautiful\\test" + i +".jpg"));}catch (Exception e) {}
+		
+		graphic.setColor(randomColor);
+		graphic.fillRect(0, 0, 30, 30);
+		graphic.drawImage(xyz,0,0,30,30,null);
+		
+		try{ImageIO.write(xyz,"jpg",new File("C:\\Users\\Torben\\Desktop\\Datensatz SchwarzWeis\\test data\\"+ foldername +"\\test" + i +".jpg"));}catch (Exception e) {}
 		
 		graphic.dispose();
 		
 		}
 		
-		
+	}
+	
+	
 	}
 	
 	
