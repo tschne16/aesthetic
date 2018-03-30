@@ -1,11 +1,22 @@
 package com.aesthetic.net;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +24,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.spi.LoggerFactory;
@@ -60,6 +73,7 @@ import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
+import org.iq80.leveldb.impl.Filename;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.activations.IActivation;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -67,9 +81,15 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
+import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 import static java.lang.Math.toIntExact;
 
@@ -80,7 +100,7 @@ public class ConvolutionalNeuralNetwork {
     protected static Random rng = new Random(seed);
     protected static double splitTrainTest = 0.8;
     static int batchSize = 	32;
-    static int epochscounter = 2;
+    static int epochscounter = 1;
     
     //private static final long seed = 12345;
 
@@ -100,18 +120,27 @@ public class ConvolutionalNeuralNetwork {
 		
 	}
 	
-	public static void newTry(String path, String path2) throws Exception
+	public static void newTry(String train_path, String test_path, String output_path) throws Exception
 	{
 		 int rngseed = 123;
 		 int outputnum = 2;
 		Random RandNumGen = new Random(rngseed);
 		String path_model = "C:\\Users\\Torben\\Desktop\\Small Dataset\\Models\\";
-		path = "C:\\Users\\Torben\\Desktop\\DatensatzLinie\\train data";
-		path2 = "C:\\Users\\Torben\\Desktop\\DatensatzLinie\\test data";
-		File trainData = new File(path);
-		File testData = new File(path2);
+		//path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\train data";
+		//path2 = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\test data";
+		File trainData = new File(train_path);
+		File testData = new File(test_path);
 		 
-		
+		List<String> labels = new ArrayList<String>(); 
+		for(File f : trainData.listFiles())
+		{
+			if(f.isDirectory())
+			{
+				labels.add(f.getName());
+			}
+			
+		}
+		java.util.Collections.sort(labels);
 		FileSplit train = new FileSplit(trainData,NativeImageLoader.ALLOWED_FORMATS,RandNumGen);
 		FileSplit test = new FileSplit(testData,NativeImageLoader.ALLOWED_FORMATS,RandNumGen);
 
@@ -128,7 +157,7 @@ public class ConvolutionalNeuralNetwork {
 		//MultiLayerNetwork network = alexnetModel(2);
 		//MultiLayerNetwork network = newNetwork();
 	 
-		File dirFile = new File(path_model);
+		File dirFile = new File(output_path);
 		
 		dirFile.mkdir();
 		 
@@ -208,39 +237,49 @@ for(int i = 1; i < 5; i++)
 				//System.out.println(testSet.getLabels());
 				testSet.shuffle();	
 				network.fit(testSet);
-				
+				testSet = null;
 				//System.out.println(testSet.getLabels().sum(0));
+				
+				
+				
+				
+				/*	if(dataIter.hasNext() == false)
+					{
+						LOGGER.info("VALIDATING");
+			        Evaluation eval = new Evaluation(2);
+			        recordReader.reset();
+					
+					recordReader.initialize(test);
+					DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader,batchSize,1, outputnum);
+					
+					//scaler.fit(testIter);
+					//testIter.setPreProcessor(scaler);
+					
+					while(testIter.hasNext())
+					{
+						DataSet next = testIter.next();
+						next.shuffle();
+						INDArray output = network.output(next.getFeatureMatrix());
+						eval.eval(next.getLabels(), output);
+						
+						System.out.println(next.getLabels().sum(0));
+						output = null;
+						next = null;
+					}
+					System.out.println("ZWISCHENAKKURANZ: " + eval.accuracy());
+					System.out.println("CONF MATRIX: " + eval.confusionToString());
+					
+					testIter = null;
+					eval = null;
+					//System.out.println(network.getLabels().sum(0));
+					
+					
+					LOGGER.info("EPOCHE Completed : " + i);
+					
+					}*/		
 				}
 				
-				dataIter.reset();
-				
-				
-		        Evaluation eval = new Evaluation(2);
-		        recordReader.reset();
-				
-				recordReader.initialize(test);
-				DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader,batchSize,1, outputnum);
-				
-				//scaler.fit(testIter);
-				//testIter.setPreProcessor(scaler);
-				
-				while(testIter.hasNext())
-				{
-					DataSet next = testIter.next();
-					next.shuffle();
-					INDArray output = network.output(next.getFeatureMatrix());
-					eval.eval(next.getLabels(), output);
-					
-					System.out.println(next.getLabels().sum(0));
-					
-				}
-				
-				
-				System.out.println(network.getLabels().sum(0));
-				
-				
-				LOGGER.info("EPOCHE Completed : " + i);
-	
+				dataIter.reset();	
 			}
 			
 			
@@ -249,14 +288,14 @@ for(int i = 1; i < 5; i++)
 			
 			
 			
-		/*	EarlyStoppingConfiguration esConf = new EarlyStoppingConfiguration.Builder()
+	/*		EarlyStoppingConfiguration esConf = new EarlyStoppingConfiguration.Builder()
 	                .epochTerminationConditions(new MaxEpochsTerminationCondition(10)) //Max of 50 epochs
 	                .evaluateEveryNEpochs(1)
 	                .iterationTerminationConditions(new MaxTimeIterationTerminationCondition(20, TimeUnit.MINUTES))
 	                .iterationTerminationConditions(new InvalidScoreIterationTerminationCondition() )//Max of 20 minutes
 	                .scoreCalculator(new DataSetLossCalculator(dataIter_test, true))     //Calculate test set score
 	                .saveLastModel(false)
-	               // .modelSaver(saver)
+	                //.modelSaver(saver)
 	                .build();
 			
 			
@@ -343,13 +382,8 @@ for(int i = 1; i < 5; i++)
 		        	LOGGER.info(e.getMessage());
 		        }
 			
-			
-			
-			
-			
-			
 			try {
-			uiServer.stop();	
+			//uiServer.stop();	
 			//uiServer.detach(statsStorage);
 	           
 	       
@@ -363,7 +397,28 @@ for(int i = 1; i < 5; i++)
 	        
 	        try {
 	      //  Model m = result.getBestModel();
-	        //ModelSerializer.writeModel(m, path_model, true);
+	        	
+	        	
+	        int counter = 0;
+	        String tmp_model_path = path_model + "\\modelconfig" +counter + ".zip";
+	        while(new File(tmp_model_path).exists())
+	        {
+	        	counter++;
+	        	tmp_model_path = path_model + "\\modelconfig" +counter + ".zip";
+	        }
+	        	
+	        ModelSerializer.writeModel(network, new File(tmp_model_path), true);
+	        
+	        
+	        ///LABELS ZU DER ZIP DATEI HINZUFÜGEN
+	        
+	        addLabelsToZipFolder(labels,new File(tmp_model_path));
+	           
+	        
+	   
+	        /////
+	        
+	        
 	        
 	        ///HIER AUCH DAS GANZE NETZ ABSPEICHERN
 	        }
@@ -384,6 +439,8 @@ for(int i = 1; i < 5; i++)
 	        dataIter_test = null;
 			LOGGER.info("TRAIN MODEL");
 			
+			//GABAGE COLLECTOR ZEIT GEBEN
+			Thread.sleep(1000);
 			}
 		}
 		
@@ -484,7 +541,89 @@ for(int i = 1; i < 5; i++)
 		
 	}
 	
+	public static void addLabelsToZipFolder(List<String> labels, File model) throws Exception 
+	{
+
+			
+			if(!model.exists())
+			{
+				return;
+			}
+			
+			
+			ZipFile zipFile = new ZipFile(model);
+			ZipParameters parameters = new ZipParameters();
+			parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+			parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+			
+
+	        	File labelfile = new File("label.txt");
+	        	int labelcount = 0;
+	        	while(labelfile.exists())
+	        	{
+	        		 labelfile = new File("label"+ labelcount + ".txt");
+	        		 labelcount++;
+	        	}
+	 
+	       
+	        	
+	        	try (PrintWriter out = new PrintWriter(labelfile)) {
+	        	for(String s : labels)
+	        	{
+	        	   out.println(s);
+	        	}
+	        		out.close();
+	        		
+	        	}
+
+	        	
+	        	ArrayList<File> newFile = new ArrayList<File>();
+	        	newFile.add(labelfile);
+	        	
+	        	zipFile.addFiles(newFile, parameters);
+	        	labelfile.delete();
+
 	
+	}
+	
+
+	public static List<String> getLabelsFromModelZip(File model) throws Exception
+	{
+		final java.util.zip.ZipFile zipFile = new  java.util.zip.ZipFile(model);
+		
+		FileInputStream fis = new FileInputStream(model);
+		BufferedInputStream bis = new BufferedInputStream(fis);
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		ZipInputStream zis = new ZipInputStream(bis);
+		
+		List<String> result = new ArrayList<String>();
+		
+		
+		  ZipEntry ze;
+		
+		  while ((ze = zis.getNextEntry()) != null) {
+			  
+			  if(!ze.isDirectory())
+			  {
+				  final String fileName = ze.getName();
+				  if (fileName.endsWith(".txt") && fileName.contains("label")) {
+				  
+					  InputStream input = zis;
+					  BufferedReader br = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+		                String line;
+		                while ((line = br.readLine()) != null) {
+		                    result.add(line);
+		                }
+		                br.close();
+		                zis.close();
+		                return result;
+				  }
+				  }
+			  }
+
+		zis.close();
+		return null;
+	}
 	public static void load(String path) throws IOException {
 
 		///*LOADING DATA*
@@ -801,6 +940,87 @@ for(int i = 1; i < 5; i++)
 	        
 	}
 
+	
+	
+	public static HashMap<String,String> Try_model(File model,File[] images) throws Exception
+	{
+		////LOAD MODEL
+		Nd4j.getRandom().setSeed(12345);
+		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(model);
+		HashMap<String,String> files = new HashMap<String,String>();
+		List<String> labels = getLabelsFromModelZip(model);
+		
+		if(labels != null)
+		{
+			int counter = 0;
+			for(String s:labels)
+			{
+				files.put("Klasse " + s, " entspricht "+ counter);
+				counter++;
+			}
+			
+			
+		}
+		
+		
+		for(File file:images)
+		{
+			NativeImageLoader loader = new NativeImageLoader(height, width, 3);
+			INDArray image = null;
+            try {
+                image = loader.asMatrix(file);
+            } catch (Exception e) {
+                LOGGER.error("the loader.asMatrix occured an error",e);
+            }
+           // LOGGER.info(network.getLabels().toString());
+            INDArray output = network.output(image);
+         
+            String introduction;
+            
+           
+            
+            int [] predict = network.predict(image);
+            String modelResult = "Prediction: ";
+            
+            
+            modelResult = modelResult + labels.get(predict[0]);
+            
+            
+            
+          /*  for(int i = 0; i < predict.length;i++)
+            {
+            	if(i < labels.size())
+            	{
+            		modelResult = modelResult + labels.get(i) + ":";
+            	}
+            	
+            	
+            	modelResult = modelResult + predict[i];
+            	
+            	if(i<predict.length-1)
+            	{
+            		modelResult = modelResult + predict[i] + ";";
+            	}*/
+            	
+            
+            
+            if(labels == null)
+            {
+            	 modelResult = output.toString();
+            	 modelResult += "===" + Arrays.toString(predict);
+            }
+           // 
+            //
+            	
+            files.put(file.getPath(), modelResult);
+		}
+		
+		
+		
+		
+		
+		return files;
+	}
 	 public static MultiLayerNetwork alexnetModel(int numLabels) {
 	        /**
 	         * AlexNet model interpretation based on the original paper ImageNet Classification with Deep Convolutional Neural Networks

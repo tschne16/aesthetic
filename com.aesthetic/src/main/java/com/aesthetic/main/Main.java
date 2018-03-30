@@ -21,7 +21,7 @@ public class Main {
 		Gui g = new Gui();
 		g.setDefaultCloseOperation(g.EXIT_ON_CLOSE);
 
-		g.setSize(453,500);
+		g.setSize(460,684);
 		g.setLocation(50,50);
 		g.setVisible(true);
 		g.setVisible(true);

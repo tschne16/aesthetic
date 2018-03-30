@@ -41,18 +41,18 @@ public class CreateImage {
 		Color randomColor = new Color(r, g, b);
 		if(x== 0)
 		{
-			randomColor = new Color(0,0,0);
+			randomColor = new Color(r,g,b);
 			
-			r = 0;
-			g = 0;
-			b = 0;
+		//	r = 0;
+		//	g = 0;
+			//b = 0;
 		}
 		else
 		{
-			randomColor = new Color(0,0,0);
-			r = 254;
-			g = 254;
-			b = 254;
+			randomColor = new Color(r,g,b);
+			//r = 254;
+			//g = 254;
+			//b = 254;
 		}
 		
 		
@@ -74,6 +74,18 @@ public class CreateImage {
                     RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
 			graphic.drawLine(0, randomNum2, randomNum3, 30);
+		}
+		else
+		{
+			int randomNum1 = ThreadLocalRandom.current().nextInt(0, 30 + 1);
+			int randomNum2 = ThreadLocalRandom.current().nextInt(0, 30 + 1);
+			graphic.setColor(new Color(255,255,255));
+			graphic.setStroke(new BasicStroke(5));
+			graphic.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+			graphic.fillOval(randomNum1, randomNum2, 3, 4);
+	
 		}
 		
 		graphic.drawImage(xyz,0,0,30,30,null);

@@ -6,8 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -32,6 +37,8 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.aesthetic.main.DBHelper;
 import com.aesthetic.main.FlickrCrawler;
@@ -57,6 +64,17 @@ public class Gui extends JFrame{
 	private JTextField txtDefinePath;
 	private JFileChooser chooser;
 	private String path;
+	private File[] files;
+	private String trainingsdata_path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\train data";
+	private String testdata_path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\test data";
+	private String output_path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\model";
+	private String model_path = "";
+	private String try_images = "";
+	private JTextField textField_traingingsdata_path;
+	private JTextField textField_testsdata_path;
+	private JTextField textField_output_path;
+	private JTextField textField_model_path;
+	private JTextField textField_image_path;
 	public Gui() throws Exception {
 		getContentPane().setLayout(null);
 		
@@ -204,7 +222,7 @@ public class Gui extends JFrame{
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(null, "2. Prepare for CNN", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel_1.setBounds(10, 286, 417, 76);
+		panel_1.setBounds(10, 280, 417, 98);
 		getContentPane().add(panel_1);
 		
 		JButton btnNewButton = new JButton("Extract");
@@ -281,42 +299,55 @@ public class Gui extends JFrame{
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(txtDefinePath, GroupLayout.PREFERRED_SIZE, 221, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnNewButton)
-						.addComponent(btnAva))
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addComponent(txtDefinePath, GroupLayout.PREFERRED_SIZE, 221, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+							.addComponent(btnAva))
+						.addComponent(btnNewButton, Alignment.TRAILING))
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap(18, Short.MAX_VALUE)
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-						.addComponent(txtDefinePath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnNewButton_1))
-					.addContainerGap())
-				.addGroup(gl_panel_1.createSequentialGroup()
-					.addComponent(btnNewButton)
-					.addPreferredGap(ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
-					.addComponent(btnAva))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+								.addComponent(txtDefinePath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnNewButton_1))
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+							.addComponent(btnNewButton)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnAva)
+							.addGap(12))))
 		);
 		panel_1.setLayout(gl_panel_1);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(10, 363, 417, 76);
+		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "3. Find Architecture", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_2.setBounds(10, 377, 417, 138);
 		getContentPane().add(panel_2);
 		panel_2.setLayout(null);
 		
-		JButton btnNewButton_2 = new JButton("Load");
+		JButton btnNewButton_2 = new JButton("find architecture");
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
 				try {
+					
+					if(output_path == ""|| trainingsdata_path == ""|| testdata_path =="")
+					{
+						JOptionPane.showMessageDialog(null, "This language just gets better and better!");
+						return;
+					}
+					
+					
 					//ConvolutionalNeuralNetwork.load(path);
-					ConvolutionalNeuralNetwork.newTry(path, path);
+					ConvolutionalNeuralNetwork.newTry(trainingsdata_path, testdata_path,output_path);
 				} catch ( Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -324,8 +355,245 @@ public class Gui extends JFrame{
 				
 			}
 		});
-		btnNewButton_2.setBounds(318, 11, 89, 23);
+		btnNewButton_2.setBounds(244, 104, 163, 23);
 		panel_2.add(btnNewButton_2);
+		
+		textField_traingingsdata_path = new JTextField();
+		textField_traingingsdata_path.setText("define path");
+		textField_traingingsdata_path.setColumns(10);
+		textField_traingingsdata_path.setBounds(121, 27, 221, 20);
+		panel_2.add(textField_traingingsdata_path);
+		
+		JLabel lblTrainingsdata = new JLabel("Trainingsdata");
+		lblTrainingsdata.setBounds(10, 27, 89, 14);
+		panel_2.add(lblTrainingsdata);
+		
+		JLabel lblTestdata = new JLabel("Testdata");
+		lblTestdata.setBounds(10, 52, 89, 14);
+		panel_2.add(lblTestdata);
+		
+		textField_testsdata_path = new JTextField();
+		textField_testsdata_path.setText("define path");
+		textField_testsdata_path.setColumns(10);
+		textField_testsdata_path.setBounds(121, 52, 221, 20);
+		panel_2.add(textField_testsdata_path);
+		
+		textField_output_path = new JTextField();
+		textField_output_path.setText("define path");
+		textField_output_path.setColumns(10);
+		textField_output_path.setBounds(121, 80, 221, 20);
+		panel_2.add(textField_output_path);
+		
+		JButton button_trainingsdata = new JButton("...");
+		button_trainingsdata.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				chooser = new JFileChooser(); 
+			    chooser.setCurrentDirectory(new java.io.File("."));
+			    chooser.setDialogTitle("Chose Storage");
+			    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			    //
+			    // disable the "All files" option.
+			    //
+			    chooser.setAcceptAllFileFilterUsed(false);
+			    //    
+			    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
+			      
+			    	trainingsdata_path = chooser.getSelectedFile().getPath();
+			    	textField_traingingsdata_path.setText(trainingsdata_path);
+			      }
+			    else {
+			    	trainingsdata_path = "";
+			      }			
+	
+			}
+		});
+		button_trainingsdata.setBounds(349, 27, 58, 23);
+		panel_2.add(button_trainingsdata);
+		
+		JButton button_testdata = new JButton("...");
+		button_testdata.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				chooser = new JFileChooser(); 
+			    chooser.setCurrentDirectory(new java.io.File("."));
+			    chooser.setDialogTitle("Chose Storage");
+			    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			    //
+			    // disable the "All files" option.
+			    //
+			    chooser.setAcceptAllFileFilterUsed(false);
+			    //    
+			    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
+			      
+			    	testdata_path = chooser.getSelectedFile().getPath();
+			    	textField_testsdata_path.setText(testdata_path);
+			      }
+			    else {
+			    	testdata_path = "";
+			      }		
+			}
+		});
+		button_testdata.setBounds(349, 55, 58, 23);
+		panel_2.add(button_testdata);
+		
+		JButton button_output = new JButton("...");
+		button_output.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				chooser = new JFileChooser(); 
+			    chooser.setCurrentDirectory(new java.io.File("."));
+			    chooser.setDialogTitle("Chose Storage");
+			    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			    //
+			    // disable the "All files" option.
+			    //
+			    chooser.setAcceptAllFileFilterUsed(false);
+			    //    
+			    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
+			      
+			    	output_path = chooser.getSelectedFile().getPath();
+			    	textField_output_path.setText(output_path);
+			      }
+			    else {
+			    	output_path = "";
+			      }		
+			}
+		});
+		button_output.setBounds(349, 79, 58, 23);
+		panel_2.add(button_output);
+		
+		JLabel lblOutput = new JLabel("Output");
+		lblOutput.setBounds(10, 77, 75, 14);
+		panel_2.add(lblOutput);
+		
+		JPanel panel_3 = new JPanel();
+		panel_3.setBounds(13, 526, 414, 108);
+		getContentPane().add(panel_3);
+		panel_3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "4. Try Model", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
+		panel_3.setLayout(null);
+		
+		JLabel lblModelPath = new JLabel("Model path");
+		lblModelPath.setBounds(10, 24, 63, 14);
+		panel_3.add(lblModelPath);
+		
+		textField_model_path = new JTextField();
+		textField_model_path.setText("define path");
+		textField_model_path.setColumns(10);
+		textField_model_path.setBounds(83, 21, 221, 20);
+		panel_3.add(textField_model_path);
+		
+		textField_image_path = new JTextField();
+		textField_image_path.setText("define path");
+		textField_image_path.setColumns(10);
+		textField_image_path.setBounds(83, 49, 221, 20);
+		panel_3.add(textField_image_path);
+		
+		JLabel lblImagePath = new JLabel("Image path");
+		lblImagePath.setBounds(10, 52, 63, 14);
+		panel_3.add(lblImagePath);
+		
+		JButton btnTryIt = new JButton("try it !");
+		btnTryIt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				if(model_path == ""|| files == null)
+				{
+					JOptionPane.showMessageDialog(null, "Bitte Pfad zum Model und Bilder auswählen!");
+					return;
+				}
+				
+				
+		
+				HashMap<String, String> ausgabe;
+				try {
+					ausgabe = ConvolutionalNeuralNetwork.Try_model(new File(model_path), files);
+					  Iterator it = ausgabe.entrySet().iterator();
+					  String erg = "";
+					    while (it.hasNext()) {
+					        Map.Entry pair = (Map.Entry)it.next();
+					        
+					        erg = erg + (pair.getKey() + " " + pair.getValue() + "\n");
+					        it.remove(); // avoids a ConcurrentModificationException
+					    }
+					
+					
+					
+		
+					
+					JOptionPane.showMessageDialog(null,erg);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null,"An Error occurred: " + e1.getMessage() );
+					e1.printStackTrace();
+				}
+				
+				
+				
+				
+			}
+		});
+		btnTryIt.setBounds(314, 74, 90, 23);
+		panel_3.add(btnTryIt);
+		
+		JButton button_model_path = new JButton("...");
+		button_model_path.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				chooser = new JFileChooser(); 
+			    chooser.setCurrentDirectory(new java.io.File("."));
+			    chooser.setDialogTitle("Chose Storage");
+			    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			    FileFilter filter = new FileNameExtensionFilter("Zip File", "zip");
+			    chooser.setFileFilter(filter);
+			    //
+			    // disable the "All files" option.
+			    //
+			    chooser.setAcceptAllFileFilterUsed(false);
+			    //    
+			    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
+			      
+			    	model_path = chooser.getSelectedFile().getPath();
+			    	textField_model_path.setText(output_path);
+			      }
+			    else {
+			    	model_path = "";
+			      }	
+				
+				
+				
+			}
+		});
+		button_model_path.setBounds(314, 24, 58, 23);
+		panel_3.add(button_model_path);
+		
+		JButton button_image_path = new JButton("...");
+		button_image_path.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				chooser = new JFileChooser(); 
+			    chooser.setCurrentDirectory(new java.io.File("."));
+			    chooser.setDialogTitle("Chose Storage");
+			    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			    FileFilter filter = new FileNameExtensionFilter("JPG File", "jpg");
+			    chooser.setFileFilter(filter);
+			    chooser.setMultiSelectionEnabled(true);
+			    //
+			    // disable the "All files" option.
+			    //
+			    chooser.setAcceptAllFileFilterUsed(false);
+			    //    
+			    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
+			    	files = chooser.getSelectedFiles();
+			    	try_images = chooser.getSelectedFile().getPath();
+			    	textField_image_path.setText(files.toString());
+			      }
+			    else {
+			    	try_images = "";
+			      }	
+			
+			
+			
+			}
+		});
+		button_image_path.setBounds(314, 48, 58, 23);
+		panel_3.add(button_image_path);
 	}
 	
 	
