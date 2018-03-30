@@ -106,8 +106,8 @@ public class ConvolutionalNeuralNetwork {
 		 int outputnum = 2;
 		Random RandNumGen = new Random(rngseed);
 		String path_model = "C:\\Users\\Torben\\Desktop\\Small Dataset\\Models\\";
-		path = "C:\\Users\\Torben\\Desktop\\Datensatz SchwarzWeis\\train data";
-		path2 = "C:\\Users\\Torben\\Desktop\\Datensatz SchwarzWeis\\test data";
+		path = "C:\\Users\\Torben\\Desktop\\DatensatzLinie\\train data";
+		path2 = "C:\\Users\\Torben\\Desktop\\DatensatzLinie\\test data";
 		File trainData = new File(path);
 		File testData = new File(path2);
 		 
@@ -145,11 +145,11 @@ public class ConvolutionalNeuralNetwork {
 		algo[1] = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
 				
 				
-for(int i = 2; i < 5; i++)
+for(int i = 1; i < 5; i++)
 {		
 	for(int z =0; z <3; z++)	
 	{
-		batchSize = 15 + 10*z;
+		batchSize = 20 + 10*z;
 		
 		for(int x=0; x < actv.length;x++)
 		{
@@ -162,23 +162,23 @@ for(int i = 2; i < 5; i++)
 			ImageRecordReader recordReader = new ImageRecordReader(height,width,channels,labelMaker);
 				
 				recordReader.initialize(train);
-				//recordReader.setListeners(new LogRecordListener());
-				DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+				recordReader.setListeners(new LogRecordListener());
+				//DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
 				DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
-				scaler.fit(dataIter);
-				dataIter.setPreProcessor(scaler);
+				//scaler.fit(dataIter);
+				//dataIter.setPreProcessor(scaler);
 				
 				//ParentPathLabelGenerator labelMaker2 = new ParentPathLabelGenerator();
 				ImageRecordReader recordReader_Test = new ImageRecordReader(height,width,channels,labelMaker);
 				recordReader_Test.initialize(test);
 				//DataNormalization scaler2 = new ImagePreProcessingScaler(0, 1);
 				DataSetIterator dataIter_test = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
-				scaler.fit(dataIter_test);
-				dataIter_test.setPreProcessor(scaler);
+				//scaler.fit(dataIter_test);
+				//dataIter_test.setPreProcessor(scaler);
 				
 				
 			MultiLayerNetwork network = own(i,weightinit,optialgo);
-				//MultiLayerNetwork network = lenetModel();
+			//MultiLayerNetwork network = lenetModel();
 			network.init();
 			
 			UIServer uiServer = UIServer.getInstance();
@@ -203,6 +203,9 @@ for(int i = 2; i < 5; i++)
 				//dataIter.next();
 				//network.fit(dataIter);
 				DataSet testSet = dataIter.next();
+				
+				//system.out.println(testSet);
+				//System.out.println(testSet.getLabels());
 				testSet.shuffle();	
 				network.fit(testSet);
 				
@@ -218,12 +221,12 @@ for(int i = 2; i < 5; i++)
 				recordReader.initialize(test);
 				DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader,batchSize,1, outputnum);
 				
-				scaler.fit(testIter);
-				testIter.setPreProcessor(scaler);
+				//scaler.fit(testIter);
+				//testIter.setPreProcessor(scaler);
 				
 				while(testIter.hasNext())
 				{
-					DataSet next = dataIter.next();
+					DataSet next = testIter.next();
 					next.shuffle();
 					INDArray output = network.output(next.getFeatureMatrix());
 					eval.eval(next.getLabels(), output);
@@ -237,11 +240,7 @@ for(int i = 2; i < 5; i++)
 				
 				
 				LOGGER.info("EPOCHE Completed : " + i);
-				
-				
-				
-				
-				
+	
 			}
 			
 			
@@ -292,8 +291,8 @@ for(int i = 2; i < 5; i++)
 			recordReader.initialize(test);
 			DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader,batchSize,1, outputnum);
 			
-			scaler.fit(testIter);
-			testIter.setPreProcessor(scaler);
+			//scaler.fit(testIter);
+			//testIter.setPreProcessor(scaler);
 			
 			while(testIter.hasNext())
 			{
@@ -350,8 +349,9 @@ for(int i = 2; i < 5; i++)
 			
 			
 			try {
-			uiServer.detach(statsStorage);
-	        uiServer.stop();	   
+			uiServer.stop();	
+			//uiServer.detach(statsStorage);
+	           
 	       
 	        uiServer = null;
 	        statsStorage.close();
@@ -373,6 +373,15 @@ for(int i = 2; i < 5; i++)
 	        }
 	        
 	        network = null;
+	        recordReader.close();
+	        recordReader_Test.close();
+	        
+	        recordReader = null;
+	        recordReader_Test = null;
+	        eval = null;
+	        
+	        dataIter = null;
+	        dataIter_test = null;
 			LOGGER.info("TRAIN MODEL");
 			
 			}
@@ -913,16 +922,15 @@ for(int i = 2; i < 5; i++)
 	    }
 	 	private static MultiLayerNetwork own(int amount_conv_layer,WeightInit weight,OptimizationAlgorithm algo)
 	 	{
-	        double nonZeroBias = 1;
+	        double nonZeroBias = 0;//1;
 	        double dropOut = 0.5;
 	        
 	        //ZU probierende Learningrates
 		    Map<Integer, Double> lrSchedule = new HashMap<>();
-		    lrSchedule.put(0, 0.0001); // iteration #, learning rate
-		    lrSchedule.put(150, 0.0001);
+		    lrSchedule.put(100, 0.0001);
+		    lrSchedule.put(200, 0.0001);
 		    lrSchedule.put(300, 0.0001);
-		    lrSchedule.put(550, 0.0001);
-		    lrSchedule.put(800, 0.0001);
+		   // lrSchedule.put(800, 0.0001);
 		   
 		    NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
 		    builder.seed(seed);
@@ -980,24 +988,28 @@ for(int i = 2; i < 5; i++)
 	 	          //.regularization(true)
 	 	          // .l2(5 * 1e-4)
 	 	            .list();*/
-	        listbuilder.layer(0, convInit("cnn1", channels, 30, new int[]{5, 5}, new int[]{1, 1}, new int[]{0, 0}, 0));
+	        listbuilder.layer(0, convInit("cnn1", channels, 50, new int[]{5, 5}, new int[]{1, 1}, new int[]{0, 0}, 0));
 	        //listbuilder.layer(1, new LocalResponseNormalization.Builder().name("lrn1").build());
-	        listbuilder.layer(1, maxPool("maxpool1", new int[]{3,3}));
+	        listbuilder.layer(1, maxPool("maxpool1", new int[]{2,2}));
 	        int counter = 0;
-	        
+	        int cnncounter = 1;
 	        for(int i = 1; i<= amount_conv_layer;i++)
 	        	{
+	        	
 	        	//listbuilder.layer(i+2, conv3x3("cnn"+i+2, 256, new int[] {1,1}, new int[] {2,2}, nonZeroBias));
-	        	listbuilder.layer(i+1,conv3x3("cnn"+i+2, 64, nonZeroBias));
-	        	listbuilder.layer(i+2, new LocalResponseNormalization.Builder().name("lrn2"+i+3).build());
-	        	listbuilder.layer(i+3, maxPool("maxpool"+ i+4, new int[]{3,3}));			
-	        	counter = i+4;
+	        	listbuilder.layer(cnncounter+1,conv3x3("cnn"+i+2, 64, nonZeroBias));
+	        	//listbuilder.layer(i+1, conv5x5("cnn"+i+2,100,new int[] {5,5},new int[] {0,0},nonZeroBias));
+	        	listbuilder.layer(cnncounter+2, new LocalResponseNormalization.Builder().name("lrn2"+i+3).build());
+	        	listbuilder.layer(cnncounter+3, maxPool("maxpool"+ i+3, new int[]{2,2}));			
+	        	cnncounter = cnncounter+4;
+	        	//counter = i+4;
 	        	}
 	        //4096
-	       listbuilder.layer(counter, fullyConnected("ffn" + counter, 1000, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
-	       listbuilder.layer(counter+1, fullyConnected("ffn" + counter+1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+	        counter = cnncounter;
+	       listbuilder.layer(counter, fullyConnected("ffn" + counter, 500, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+	      // listbuilder.layer(counter+1, fullyConnected("ffn" + counter+1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
 		      
-	       listbuilder.layer(counter+2, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
+	       listbuilder.layer(counter+1, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
 	                .name("output")
 	                .nOut(2)
 	               // .nIn(256)
