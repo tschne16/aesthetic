@@ -44,7 +44,9 @@ import com.aesthetic.main.DBHelper;
 import com.aesthetic.main.FlickrCrawler;
 import com.aesthetic.net.AVAStructureGeneratior;
 import com.aesthetic.net.ConvolutionalNeuralNetwork;
+import com.aesthetic.net.NetworkType;
 import com.aesthetic.net.StructureGenerator;
+import javax.swing.JRadioButton;
 
 public class Gui extends JFrame{
 	/**
@@ -75,6 +77,9 @@ public class Gui extends JFrame{
 	private JTextField textField_output_path;
 	private JTextField textField_model_path;
 	private JTextField textField_image_path;
+	private JRadioButton rdbtnGoogleNet;
+	private JRadioButton rdbtnAlexnet;
+	private JRadioButton rdbtnOwn;
 	public Gui() throws Exception {
 		getContentPane().setLayout(null);
 		
@@ -329,7 +334,7 @@ public class Gui extends JFrame{
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "3. Find Architecture", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_2.setBounds(10, 377, 417, 138);
+		panel_2.setBounds(10, 377, 417, 178);
 		getContentPane().add(panel_2);
 		panel_2.setLayout(null);
 		
@@ -345,9 +350,16 @@ public class Gui extends JFrame{
 						return;
 					}
 					
+					NetworkType nettype = NetworkType.OWN;
+					
+					if(rdbtnGoogleNet.isSelected())
+						nettype = NetworkType.GoogleNet;
+					
+					if(rdbtnAlexnet.isSelected())
+						nettype = NetworkType.AlexNet;
 					
 					//ConvolutionalNeuralNetwork.load(path);
-					ConvolutionalNeuralNetwork.newTry(trainingsdata_path, testdata_path,output_path);
+					ConvolutionalNeuralNetwork.newTry(trainingsdata_path, testdata_path,output_path,nettype);
 				} catch ( Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -355,7 +367,7 @@ public class Gui extends JFrame{
 				
 			}
 		});
-		btnNewButton_2.setBounds(244, 104, 163, 23);
+		btnNewButton_2.setBounds(244, 144, 163, 23);
 		panel_2.add(btnNewButton_2);
 		
 		textField_traingingsdata_path = new JTextField();
@@ -465,8 +477,27 @@ public class Gui extends JFrame{
 		lblOutput.setBounds(10, 77, 75, 14);
 		panel_2.add(lblOutput);
 		
+		JPanel panel_4 = new JPanel();
+		panel_4.setBorder(new TitledBorder(null, "choose Network", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_4.setBounds(10, 102, 407, 42);
+		panel_2.add(panel_4);
+		panel_4.setLayout(null);
+		
+		 rdbtnOwn = new JRadioButton("own Network");
+		rdbtnOwn.setSelected(true);
+		rdbtnOwn.setBounds(6, 12, 109, 23);
+		panel_4.add(rdbtnOwn);
+		
+		 rdbtnGoogleNet = new JRadioButton("GoogleNet");
+		rdbtnGoogleNet.setBounds(118, 12, 109, 23);
+		panel_4.add(rdbtnGoogleNet);
+		
+		 rdbtnAlexnet = new JRadioButton("AlexNet");
+		rdbtnAlexnet.setBounds(223, 12, 109, 23);
+		panel_4.add(rdbtnAlexnet);
+		
 		JPanel panel_3 = new JPanel();
-		panel_3.setBounds(13, 526, 414, 108);
+		panel_3.setBounds(13, 556, 414, 108);
 		getContentPane().add(panel_3);
 		panel_3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "4. Try Model", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel_3.setLayout(null);

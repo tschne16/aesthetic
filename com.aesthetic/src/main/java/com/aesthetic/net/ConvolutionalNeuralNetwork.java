@@ -56,6 +56,7 @@ import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.eval.RegressionEvaluation;
 import org.deeplearning4j.nn.api.Model;
+import org.deeplearning4j.nn.api.NeuralNetwork;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.*;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration.ListBuilder;
@@ -65,6 +66,7 @@ import org.deeplearning4j.nn.conf.distribution.NormalDistribution;
 import org.deeplearning4j.nn.conf.inputs.InputType;
 import org.deeplearning4j.nn.conf.inputs.InvalidInputTypeException;
 import org.deeplearning4j.nn.conf.layers.*;
+import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.api.IterationListener;
@@ -73,6 +75,7 @@ import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
+import org.deeplearning4j.zoo.ZooModel;
 import org.iq80.leveldb.impl.Filename;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.activations.IActivation;
@@ -85,7 +88,8 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.slf4j.Logger;
-
+import org.deeplearning4j.zoo.model.AlexNet;
+import org.deeplearning4j.zoo.model.GoogLeNet;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
@@ -120,7 +124,7 @@ public class ConvolutionalNeuralNetwork {
 		
 	}
 	
-	public static void newTry(String train_path, String test_path, String output_path) throws Exception
+	public static void newTry(String train_path, String test_path, String output_path, NetworkType networktype) throws Exception
 	{
 		 int rngseed = 123;
 		 int outputnum = 2;
@@ -130,7 +134,8 @@ public class ConvolutionalNeuralNetwork {
 		//path2 = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\test data";
 		File trainData = new File(train_path);
 		File testData = new File(test_path);
-		 
+		UIServer uiServer =null;
+		StatsStorage statsStorage = null;
 		List<String> labels = new ArrayList<String>(); 
 		for(File f : trainData.listFiles())
 		{
@@ -156,7 +161,30 @@ public class ConvolutionalNeuralNetwork {
 		
 		//MultiLayerNetwork network = alexnetModel(2);
 		//MultiLayerNetwork network = newNetwork();
-	 
+		MultiLayerNetwork network = null;
+		ComputationGraph googlenet = null;
+		if(networktype == NetworkType.AlexNet)
+		{
+		AlexNet zooModel = new org.deeplearning4j.zoo.model.AlexNet(2, seed, 1);
+		network = new MultiLayerNetwork(zooModel.conf());
+		network.init();
+		}
+		else if(networktype == NetworkType.GoogleNet)
+		{
+			googlenet = new ComputationGraph(new org.deeplearning4j.zoo.model.GoogLeNet(2, seed, 1).conf());
+			googlenet.init();
+		}
+	
+		//zooModel.init();
+		
+		//File model = new File("C:\\Users\\Torben\\Downloads\\googlenet_dl4j_inference.zip");
+		
+		//ComputationGraph network = ModelSerializer.restoreComputationGraph(model);
+		
+		
+		
+		
+		
 		File dirFile = new File(output_path);
 		
 		dirFile.mkdir();
@@ -165,13 +193,13 @@ public class ConvolutionalNeuralNetwork {
 		
 
 		///TRY Different Stuff
-		WeightInit[] actv = new WeightInit[2];
+		WeightInit[] actv = new WeightInit[1];
 		
-		actv[0] = WeightInit.DISTRIBUTION;
-		actv[1] = WeightInit.XAVIER;
-		OptimizationAlgorithm[] algo = new OptimizationAlgorithm[2];
+		//actv[0] = WeightInit.DISTRIBUTION;
+		//actv[1] = WeightInit.XAVIER;
+		OptimizationAlgorithm[] algo = new OptimizationAlgorithm[1];
 		algo[0] = 	null;	
-		algo[1] = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
+		//algo[1] = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
 				
 				
 for(int i = 1; i < 5; i++)
@@ -180,10 +208,13 @@ for(int i = 1; i < 5; i++)
 	{
 		batchSize = 20 + 10*z;
 		
+		//VORERST OHNE FUNKTION
 		for(int x=0; x < actv.length;x++)
 		{
 			WeightInit weightinit = actv[x];
 
+			
+			///SCHLEIFE VORERST ohne Funktion (algo = 0;)
 		for(int f = 0; f < algo.length;f++)
 		{
 			OptimizationAlgorithm optialgo = algo[f];
@@ -205,24 +236,34 @@ for(int i = 1; i < 5; i++)
 				//scaler.fit(dataIter_test);
 				//dataIter_test.setPreProcessor(scaler);
 				
+				if(networktype == NetworkType.OWN)
+				{
+					network = own(i,weightinit,optialgo);
+					network.init();
+				}
 				
-			MultiLayerNetwork network = own(i,weightinit,optialgo);
+				
+			if(networktype != NetworkType.GoogleNet )
+			{
+					
+				 uiServer = UIServer.getInstance();
+			     statsStorage = new InMemoryStatsStorage();  
+			    int listenerFrequency = 1;
+			    network.setListeners(new StatsListener(statsStorage, listenerFrequency));
+			    uiServer.attach(statsStorage);
+			    
+				network.setListeners(new ScoreIterationListener(10));
+				List<IterationListener> listeners = new ArrayList<>();
+				listeners.add(new ScoreIterationListener(10));
+				listeners.add(new StatsListener(statsStorage, listenerFrequency));
+				network.setListeners(listeners);
+			
+			}
+			//MultiLayerNetwork 
 			//MultiLayerNetwork network = lenetModel();
-			network.init();
+			//network.init();
 			
-			UIServer uiServer = UIServer.getInstance();
-		    StatsStorage statsStorage = new InMemoryStatsStorage();  
-		    int listenerFrequency = 1;
-		    network.setListeners(new StatsListener(statsStorage, listenerFrequency));
-		    uiServer.attach(statsStorage);
-		    
-			network.setListeners(new ScoreIterationListener(10));
-			List<IterationListener> listeners = new ArrayList<>();
-			listeners.add(new ScoreIterationListener(10));
-			listeners.add(new StatsListener(statsStorage, listenerFrequency));
-		
-			
-			network.setListeners(listeners);
+
 		//	EarlyStoppingModelSaver saver = new LocalFileModelSaver(path_model);
 	       
 			for(int w = 0;w < epochscounter;w++)
@@ -231,16 +272,29 @@ for(int i = 1; i < 5; i++)
 				{
 				//dataIter.next();
 				//network.fit(dataIter);
+					try {
 				DataSet testSet = dataIter.next();
-				
+			
 				//system.out.println(testSet);
 				//System.out.println(testSet.getLabels());
 				testSet.shuffle();	
+				//network.fit(testSet);
+				if(networktype != NetworkType.GoogleNet)
+				{
 				network.fit(testSet);
+				}
+				else
+				{
+				googlenet.fit(testSet);
+				}
 				testSet = null;
 				//System.out.println(testSet.getLabels().sum(0));
 				
-				
+					}
+					catch(Exception e)
+						{
+						LOGGER.info("FAILED to train Network! " + e.getMessage());
+						}
 				
 				
 				/*	if(dataIter.hasNext() == false)
@@ -324,22 +378,36 @@ for(int i = 1; i < 5; i++)
 	        
 	        //EVALUATION
 	        
-	        Evaluation eval = new Evaluation(2);
+	       // Evaluation eval = new Evaluation(2);
 	        recordReader.reset();
-			
 			recordReader.initialize(test);
 			DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader,batchSize,1, outputnum);
 			
+			Evaluation eval = new Evaluation(2);
+			
+			if(networktype != NetworkType.GoogleNet)
+			{
+			 eval = network.evaluate(testIter);
+			}
+			else
+			{
+				eval = googlenet.evaluate(testIter);
+			}
 			//scaler.fit(testIter);
 			//testIter.setPreProcessor(scaler);
 			
-			while(testIter.hasNext())
+		//Evaluation	eval = cg.evaluate(testIter);
+			
+		/*	while(testIter.hasNext())
 			{
 				DataSet next = testIter.next();
 				next.shuffle();
-				INDArray output = network.output(next.getFeatureMatrix());
+				//INDArray output = network.output(next.getFeatureMatrix());
+				INDArray output = cg.output(next.getFeatureMatrix())[0];
 				eval.eval(next.getLabels(), output);
-			}
+				
+				
+			}*/
 			
 			LOGGER.info(eval.stats());
 			LOGGER.info(Double.toString(eval.accuracy()));
@@ -406,10 +474,16 @@ for(int i = 1; i < 5; i++)
 	        	counter++;
 	        	tmp_model_path = path_model + "\\modelconfig" +counter + ".zip";
 	        }
-	        	
+	        
+	        if(networktype != NetworkType.GoogleNet)
+	        {
 	        ModelSerializer.writeModel(network, new File(tmp_model_path), true);
-	        
-	        
+	        }
+	        else
+	        {
+	        	 ModelSerializer.writeModel(googlenet, new File(tmp_model_path), true);
+	        }
+	       
 	        ///LABELS ZU DER ZIP DATEI HINZUFÜGEN
 	        
 	        addLabelsToZipFolder(labels,new File(tmp_model_path));
@@ -427,7 +501,7 @@ for(int i = 1; i < 5; i++)
 	        	LOGGER.info("NOT SAVED : " + e.getMessage());
 	        }
 	        
-	        network = null;
+	        //network = null;
 	        recordReader.close();
 	        recordReader_Test.close();
 	        
@@ -441,6 +515,13 @@ for(int i = 1; i < 5; i++)
 			
 			//GABAGE COLLECTOR ZEIT GEBEN
 			Thread.sleep(1000);
+			
+			///NUR WEITER OPTIMIEREN WENN OWN		
+			if(networktype != NetworkType.OWN)
+			{
+				return;
+			}
+			
 			}
 		}
 		
@@ -1327,3 +1408,5 @@ for(int i = 1; i < 5; i++)
 	        return new DenseLayer.Builder().name(name).nOut(out).biasInit(bias).dropOut(dropOut).activation(Activation.RELU).build();
 	    }
 }
+
+

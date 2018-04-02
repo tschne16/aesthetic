@@ -34,6 +34,10 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 	private static final Logger LOGGER = Logger.getLogger( DBHelper.class.getName() );
 	private static double count_all = 0;
 	private static double counter = 0;
+	
+	
+	
+	
 	@Override
 	protected Void doInBackground() throws Exception
 	{
@@ -42,7 +46,7 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 		
 		///HIer wurde das Base64 noch nicht geladen --> da zu groß
 		//Nachträglich als Eager fetch laden in 500ter schritten um DB Last zu reduzieren
-		List<Info> allpics = DBHelper.LoadAllPictures(100);
+		List<Info> allpics = DBHelper.LoadAllPictures(100,null);
 
 		List<Info> eager = new ArrayList<Info>();
 		
@@ -150,6 +154,58 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		
+		
+		String path = "C:\\Users\\Torben\\Desktop\\DOGLANDSCAPE";
+		
+		
+		File output = new File(path);
+		output.mkdirs();
+		
+		String[] tags = new String[] {"dog","hund"};
+		
+		List<Info> list = DBHelper.LoadAllPictures(0,tags);
+		
+		
+List<Info> eager = new ArrayList<Info>();
+		
+		for(int i = 0; i < list.size();i++)
+		{
+			eager.add(list.get(i));
+			
+			if(i%500 == 0)
+			{
+			Map<Long, String> dic = DBHelper.Eager_load_base64(eager);
+			//process(dic,eager);
+			String filetype = "jpg";
+			
+			
+			
+			for(int x =0;x < eager.size(); x++)
+			{
+				if(eager.get(x).getFormat() != null)
+				{
+					filetype = eager.get(x).getFormat();
+				}
+				
+				Decode64AndWriteToFile(dic.get(eager.get(x).getPhotoid()), path, eager.get(x).getPhotoid(), filetype);
+			}
+			
+			eager.clear();
+			dic = null;
+			}
+		}
+		
+		if(eager.size() != 0)
+		{
+			Map<Long, String> dic = DBHelper.Eager_load_base64(eager);
+			process(dic,eager);
+			eager.clear();
+			dic = null;
+			eager = null;
+		}
+		
+		
 		// TODO Auto-generated method stub
 /*		List<Info> allpics = DBHelper.LoadAllPictures(100);
 		double accurancy = 0.5;
@@ -196,6 +252,10 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 		
 		BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
 		
+		
+		if(image == null)
+			return;
+		
 		image = Scalr.resize(image,Scalr.Mode.FIT_EXACT, 30,30);
 		
 		
@@ -214,6 +274,10 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 			LOGGER.log(Level.INFO, e.getMessage());
 		}
 	}
+	
+	
+	
+	
 	public String getPath() {
 		return path;
 	}

@@ -32,7 +32,7 @@ public class CreateImage {
 		
 		for(int i = 1;i<=300;i++)
 		{
-		BufferedImage xyz = new BufferedImage(30,30,BufferedImage.TYPE_INT_RGB);
+		BufferedImage xyz = new BufferedImage(224,224,BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphic = xyz.createGraphics();
 		
 		float r = rand.nextFloat();
@@ -57,14 +57,14 @@ public class CreateImage {
 		
 		
 		graphic.setColor(randomColor);
-		graphic.fillRect(0, 0, 30, 30);
+		graphic.fillRect(0, 0, 224, 224);
 		
 		if(x==0)
 		{
-			int randomNum1 = ThreadLocalRandom.current().nextInt(0, 30 + 1);
-			int randomNum2 = ThreadLocalRandom.current().nextInt(0, 30 + 1);
-			int randomNum3 = ThreadLocalRandom.current().nextInt(0, 30 + 1);
-			int randomNum4 = ThreadLocalRandom.current().nextInt(0, 30 + 1);
+			int randomNum1 = ThreadLocalRandom.current().nextInt(0, 224 + 1);
+			int randomNum2 = ThreadLocalRandom.current().nextInt(0, 224 + 1);
+			int randomNum3 = ThreadLocalRandom.current().nextInt(0, 224 + 1);
+			int randomNum4 = ThreadLocalRandom.current().nextInt(0, 224 + 1);
 			
 			
 			
@@ -88,8 +88,8 @@ public class CreateImage {
 	
 		}
 		
-		graphic.drawImage(xyz,0,0,30,30,null);
-		String path = "C:\\Users\\Torben\\Desktop\\DatensatzLinie\\test data\\"+ foldername;
+		graphic.drawImage(xyz,0,0,224,224,null);
+		String path = "C:\\Users\\Torben\\Desktop\\GoogleData\\test data\\"+ foldername;
 		new File(path).mkdirs();
 		try{ImageIO.write(xyz,"jpg",new File(path +"\\test" + i +".jpg"));}catch (Exception e) {}
 		

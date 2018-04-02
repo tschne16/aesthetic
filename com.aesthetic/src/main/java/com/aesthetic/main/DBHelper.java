@@ -25,6 +25,7 @@ static final String READ_ALLPHOTO_IDS_SQL = "SELECT photoid FROM flickr.flickr;"
 static final String Update_OBJECT_SQL = "UPDATE flickr.flickr set phototitel =  ?, tags = ? where photoid = ?";
 static final String LOAD_DATA_INFO = "SELECT photoid,url,phototitel,favs,views,CONVERT(base64 USING utf8) as base64 FROM flickr.flickr where favs >= ?";
 static final String LOAD_DATA_INFO_LAZY = "SELECT photoid,favs,views,pictureformat FROM flickr.flickr where views >= ? and favs > 0 order by photoid LIMIT 100000";
+static final String LOAD_DATA_INFO_LAZY_TAGS = "SELECT photoid,favs,views,pictureformat FROM flickr.flickr where views >= ? and favs > 0 and tags like ? order by photoid LIMIT 100000";
 static final String Delete_BY_PhoTOID = "DELETE FROM flickr.flickr where photoid = ?";
 static final String GET_AMOUNT = "SELECT COUNT(PHOTOID) from flickr.flickr";
 static Connection conn;
@@ -233,12 +234,29 @@ public static long Get_Amount() throws Exception
 	}
 	
 }
-public static List<Info> LoadAllPictures(int min_favcount) throws Exception
+public static List<Info> LoadAllPictures(int min_favcount, String[] tag) throws Exception
 {
 	List<Info> result = new ArrayList();
 	getConnection();
-	PreparedStatement statement = conn.prepareStatement(LOAD_DATA_INFO_LAZY,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+	PreparedStatement statement = null;
 	
+	if(tag == null)
+	{
+	 statement = conn.prepareStatement(LOAD_DATA_INFO_LAZY,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+	}
+	else
+	{
+	 statement = conn.prepareStatement(LOAD_DATA_INFO_LAZY_TAGS,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+	String tagstring = "";
+	
+	for(int i = 0;i< tag.length;i++)
+	{
+		tagstring = "%" + tag[i];
+	}
+	tagstring = tagstring + "%";
+	 
+	 statement.setString(2, tagstring);
+	}
 	statement.setInt(1, min_favcount);
 	statement.setFetchSize(1000);
 	ResultSet rs = null;

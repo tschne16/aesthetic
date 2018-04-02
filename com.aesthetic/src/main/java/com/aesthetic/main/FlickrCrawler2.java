@@ -533,7 +533,7 @@ public class FlickrCrawler2 extends SwingWorker<Void, Long>{
     
     public static void UpdatePhoto(Flickr flickr) throws Exception
     {
-    	List<Info> all = DBHelper.LoadAllPictures(0);
+    	List<Info> all = DBHelper.LoadAllPictures(0,null);
     	
     	for(Info i:all)
     	{
