@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
@@ -59,6 +60,7 @@ public class Gui extends JFrame{
 	private JSpinner spinner_desired;
 	public JProgressBar progressBar;
 	public FlickrCrawler worker;
+	public ConvolutionalNeuralNetwork conv_worker;
 	public StructureGenerator struc_worker;
 	public JTextArea textAreaParams;
 	public JLabel lblNewLabel_existindData;
@@ -80,6 +82,8 @@ public class Gui extends JFrame{
 	private JRadioButton rdbtnGoogleNet;
 	private JRadioButton rdbtnAlexnet;
 	private JRadioButton rdbtnOwn;
+	private ButtonGroup btG;
+	private ProgressGui pg;
 	public Gui() throws Exception {
 		getContentPane().setLayout(null);
 		
@@ -346,7 +350,7 @@ public class Gui extends JFrame{
 					
 					if(output_path == ""|| trainingsdata_path == ""|| testdata_path =="")
 					{
-						JOptionPane.showMessageDialog(null, "This language just gets better and better!");
+						JOptionPane.showMessageDialog(null, "Please define all Paths!");
 						return;
 					}
 					
@@ -359,7 +363,19 @@ public class Gui extends JFrame{
 						nettype = NetworkType.AlexNet;
 					
 					//ConvolutionalNeuralNetwork.load(path);
-					ConvolutionalNeuralNetwork.newTry(trainingsdata_path, testdata_path,output_path,nettype);
+					
+					 pg = new ProgressGui(Gui.this);
+					pg.setDefaultCloseOperation(pg.HIDE_ON_CLOSE);
+					pg.setSize(560,560);
+					pg.setLocation(140,140);
+					pg.setVisible(true);
+					
+					
+					
+					conv_worker = new ConvolutionalNeuralNetwork(trainingsdata_path, testdata_path, output_path, pg, nettype);
+					
+					conv_worker.execute();
+					//ConvolutionalNeuralNetwork.newTry(trainingsdata_path, testdata_path,output_path,nettype);
 				} catch ( Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -625,6 +641,13 @@ public class Gui extends JFrame{
 		});
 		button_image_path.setBounds(314, 48, 58, 23);
 		panel_3.add(button_image_path);
+		
+		 btG = new ButtonGroup();
+		btG.add(rdbtnAlexnet);
+		btG.add(rdbtnGoogleNet);
+		btG.add(rdbtnOwn);
+		
+		
 	}
 	
 	
