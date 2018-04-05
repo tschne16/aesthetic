@@ -53,12 +53,9 @@ public class ProgressGui extends JDialog {
 		 lblWert.setBounds(95, 11, 75, 14);
 		getContentPane().add(lblWert);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 39, 414, 399);
-		getContentPane().add(scrollPane);
-		
 		 textArea = new JTextArea();
-		scrollPane.setViewportView(textArea);
+		 textArea.setBounds(10, 47, 520, 446);
+		 getContentPane().add(textArea);
 		
 		
 		

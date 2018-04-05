@@ -126,8 +126,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 
     private static final Random randNumGen = new Random(seed);
 
-    private static final int height = 30;
-    private static final int width = 30;
+    private static final int height = 224;
+    private static final int width = 224;
     private static final int channels = 3;
     private static final int epochs = 50;
     private static final String outputtxt_file ="C:\\Users\\Torben\\Desktop\\Small Dataset\\";
@@ -141,6 +141,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 	private String test_path = "";
 	private String output_path = "";
 	private NetworkType networkType;
+	private boolean showinbrowser = true;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
@@ -148,14 +149,15 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 	}
 	
 	
-	public ConvolutionalNeuralNetwork(String train,String test, String out, ProgressGui proggui, NetworkType nettype)
+	public ConvolutionalNeuralNetwork(String train,String test, String out, ProgressGui proggui, NetworkType nettype, boolean showinb)
 	{
 		  JDP = proggui.getTextArea();
-		  jlabel = proggui.getLblBestAccuracy();
+		  jlabel = proggui.getLblWert();
 		  train_path = train;
 		  test_path = test;
 		  output_path = out;
 		  networkType = nettype;
+		  showinbrowser = showinb;
 	}
 	
 	public static void newTry(String train_path, String test_path, String output_path, NetworkType networktype) throws Exception
@@ -710,7 +712,7 @@ for(int i = 1; i <= 5; i++)
 	                .nOut(2)
 	                .activation(Activation.SOFTMAX)
 	                .build())
-	            .setInputType(InputType.convolutional(30, 30, 3)) // InputType.convolutional for normal image
+	            .setInputType(InputType.convolutional(height, width, 3)) // InputType.convolutional for normal image
 	            .backprop(true).pretrain(false).build();
 		
 		
@@ -764,7 +766,7 @@ for(int i = 1; i <= 5; i++)
 	                .nOut(2)
 	                .activation(Activation.SOFTMAX)
 	                .build())
-	            .setInputType(InputType.convolutionalFlat(30, 30, 3)) // InputType.convolutional for normal image
+	            .setInputType(InputType.convolutionalFlat(height, width, 3)) // InputType.convolutional for normal image
 	            .backprop(true).pretrain(false).build();
 		
 		
@@ -1568,7 +1570,7 @@ for(int i = 1; i <= 5; i++)
 			int rngseed = 123;
 			 int outputnum = 2;
 			Random RandNumGen = new Random(rngseed);
-			String path_model = "C:\\Users\\Torben\\Desktop\\Small Dataset\\Models\\";
+			String path_model = output_path;//"C:\\Users\\Torben\\Desktop\\Small Dataset\\Models\\";
 			//path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\train data";
 			//path2 = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\test data";
 			File trainData = new File(train_path);
@@ -1644,7 +1646,7 @@ for(int i = 1; i <= 5; i++)
 		///ANZAHL SCHICHTEN			
 	for(int i = 1; i <= 5; i++)
 	{		
-		
+		publish("Number of additional Layers:" + i);
 		//BATCHSIZE VARIATION 
 		for(int z =0; z <3; z++)	
 		{
@@ -1689,17 +1691,24 @@ for(int i = 1; i <= 5; i++)
 				if(networkType != NetworkType.GoogleNet )
 				{
 						
+					List<IterationListener> listeners = new ArrayList<>();
+					
+					if(showinbrowser)
+					{
 					 uiServer = UIServer.getInstance();
 				     statsStorage = new InMemoryStatsStorage();  
 				    int listenerFrequency = 1;
-				    network.setListeners(new StatsListener(statsStorage, listenerFrequency));
+				    //network.setListeners(new StatsListener(statsStorage, listenerFrequency));
 				    uiServer.attach(statsStorage);
-				    
-					network.setListeners(new ScoreIterationListener(10));
-					List<IterationListener> listeners = new ArrayList<>();
-					listeners.add(new ScoreIterationListener(10));
-					listeners.add(new StatsListener(statsStorage, listenerFrequency));
+				    listeners.add(new StatsListener(statsStorage, listenerFrequency));
+				    listeners.add(new ScoreIterationListener(10));			
 					network.setListeners(listeners);
+					}
+					else
+					{
+					network.setListeners(new ScoreIterationListener(10));
+					}
+					
 				
 				}
 				//MultiLayerNetwork 
@@ -1918,7 +1927,10 @@ for(int i = 1; i <= 5; i++)
 		           
 		       
 		        uiServer = null;
+		        if(statsStorage != null)
 		        statsStorage.close();
+		        
+		        
 				}
 				catch(Exception e)
 				{

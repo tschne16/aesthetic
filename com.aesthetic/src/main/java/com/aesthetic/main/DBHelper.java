@@ -33,20 +33,22 @@ static final String WRITE_AVA_SQL = "INSERT INTO flickr.ava(photoid,rating,tags)
 static final String READ_AVA_SQL = "SELECT * FROM flickr.ava Limit 25000";
 static final String READ_AVA_SQL_RAPID = "select * from flickr.ava where rating < 4.5 or rating >= 5.5 Limit 13200";
 private static long called;
-static String driver;
-static String pw;
-static String user;
-static String url;
+
+
+static String driver = "com.mysql.jdbc.Driver";
+static String password = "root";
+static String user = "root";
+static String url ="jdbc:mysql://localhost:3306/flickr?autoReconnect=true&useSSL=false";
 
 private static final Logger LOGGER = Logger.getLogger( DBHelper.class.getName() );
 
 
-public DBHelper(String d, String pw, String user, String u)
+public DBHelper(String d, String pw, String us, String u)
 {
-	 driver = "com.mysql.jdbc.Driver";
-     url = "jdbc:mysql://localhost:3306/flickr?autoReconnect=true&useSSL=false";
-     user = "root";
-     pw = "root";
+	 driver = d;
+     url = "jdbc:mysql://" + u + "?autoReconnect=true&useSSL=false";
+     user = us;
+     password = pw;
 }
 
 public static List<AVAHelper> Load_AVA() throws Exception
@@ -113,7 +115,7 @@ public static void getConnection() throws Exception {
 	if(conn == null)
 	{
 	String driver= "com.mysql.jdbc.Driver";
-    String url = "jdbc:mysql://localhost:3306/flickr";
+    String url = "jdbc:mysql://localhost:3306/flickr?autoReconnect=true&useSSL=false";
     String username = "root";
     String password = "root";
     Class.forName(driver).newInstance();

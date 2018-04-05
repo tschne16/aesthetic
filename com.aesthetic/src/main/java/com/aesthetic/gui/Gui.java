@@ -223,7 +223,7 @@ public class Gui extends JFrame{
 		chckbxStore.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 			
-				JOptionPane.showMessageDialog(null, "stored");
+				//JOptionPane.showMessageDialog(null, "stored");
 			}
 		});
 		chckbxStore.setBounds(217, 32, 51, 23);
@@ -338,7 +338,7 @@ public class Gui extends JFrame{
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "3. Find Architecture", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_2.setBounds(10, 377, 417, 178);
+		panel_2.setBounds(10, 377, 417, 196);
 		getContentPane().add(panel_2);
 		panel_2.setLayout(null);
 		
@@ -363,7 +363,7 @@ public class Gui extends JFrame{
 						nettype = NetworkType.AlexNet;
 					
 					//ConvolutionalNeuralNetwork.load(path);
-					
+					boolean showinbrowser = chckbxStore.isSelected();
 					 pg = new ProgressGui(Gui.this);
 					pg.setDefaultCloseOperation(pg.HIDE_ON_CLOSE);
 					pg.setSize(560,560);
@@ -372,7 +372,7 @@ public class Gui extends JFrame{
 					
 					
 					
-					conv_worker = new ConvolutionalNeuralNetwork(trainingsdata_path, testdata_path, output_path, pg, nettype);
+					conv_worker = new ConvolutionalNeuralNetwork(trainingsdata_path, testdata_path, output_path, pg, nettype,showinbrowser);
 					
 					conv_worker.execute();
 					//ConvolutionalNeuralNetwork.newTry(trainingsdata_path, testdata_path,output_path,nettype);
@@ -383,7 +383,7 @@ public class Gui extends JFrame{
 				
 			}
 		});
-		btnNewButton_2.setBounds(244, 144, 163, 23);
+		btnNewButton_2.setBounds(244, 162, 163, 23);
 		panel_2.add(btnNewButton_2);
 		
 		textField_traingingsdata_path = new JTextField();
@@ -495,25 +495,25 @@ public class Gui extends JFrame{
 		
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new TitledBorder(null, "choose Network", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel_4.setBounds(10, 102, 407, 42);
+		panel_4.setBounds(10, 102, 407, 49);
 		panel_2.add(panel_4);
 		panel_4.setLayout(null);
 		
 		 rdbtnOwn = new JRadioButton("own Network");
 		rdbtnOwn.setSelected(true);
-		rdbtnOwn.setBounds(6, 12, 109, 23);
+		rdbtnOwn.setBounds(6, 19, 109, 23);
 		panel_4.add(rdbtnOwn);
 		
 		 rdbtnGoogleNet = new JRadioButton("GoogleNet");
-		rdbtnGoogleNet.setBounds(118, 12, 109, 23);
+		rdbtnGoogleNet.setBounds(118, 19, 109, 23);
 		panel_4.add(rdbtnGoogleNet);
 		
 		 rdbtnAlexnet = new JRadioButton("AlexNet");
-		rdbtnAlexnet.setBounds(223, 12, 109, 23);
+		rdbtnAlexnet.setBounds(223, 19, 109, 23);
 		panel_4.add(rdbtnAlexnet);
 		
 		JPanel panel_3 = new JPanel();
-		panel_3.setBounds(13, 556, 414, 108);
+		panel_3.setBounds(13, 586, 414, 108);
 		getContentPane().add(panel_3);
 		panel_3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "4. Try Model", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel_3.setLayout(null);
@@ -646,6 +646,11 @@ public class Gui extends JFrame{
 		btG.add(rdbtnAlexnet);
 		btG.add(rdbtnGoogleNet);
 		btG.add(rdbtnOwn);
+		
+		JCheckBox chckbxShowBrowser = new JCheckBox("Show models in browser");
+		chckbxShowBrowser.setSelected(true);
+		chckbxShowBrowser.setBounds(10, 162, 172, 23);
+		panel_2.add(chckbxShowBrowser);
 		
 		
 	}
