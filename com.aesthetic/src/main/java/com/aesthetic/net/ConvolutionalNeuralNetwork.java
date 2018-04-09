@@ -210,9 +210,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 				.setInputType(InputType.convolutional(height, width, 3)) // InputType.convolutional for normal image
 				.backprop(true).pretrain(false).build();
 
-		conf.setInferenceWorkspaceMode(WorkspaceMode.SINGLE);
-		conf.setTrainingWorkspaceMode(WorkspaceMode.SINGLE);
-				
+		Nd4j.getMemoryManager().setAutoGcWindow(5000);
+		
 		return new MultiLayerNetwork(conf);
 
 	}
