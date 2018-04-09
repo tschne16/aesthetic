@@ -989,6 +989,10 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			googlenet = new ComputationGraph(new com.aesthetic.net.GoogLeNet(2, seed).conf());
 			googlenet.init();
 		}
+		else if(networkType == NetworkType.Kao)
+		{
+			network = Kao();
+		}
 
 		// zooModel.init();
 
@@ -1121,8 +1125,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 							 */
 
 						}
-						LOGGER.info("EPOCHE COMPLETED" + w);
-						LOGGER.info("EPOCHES Remaining" + (epochscounter - w - 1));
+						LOGGER.info("EPOCHE COMPLETED: " + w);
+						LOGGER.info("EPOCHES Remaining: " + (epochscounter - w - 1));
 						dataIter.reset();
 					}
 

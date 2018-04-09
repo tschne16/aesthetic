@@ -89,7 +89,7 @@ public class Gui extends JFrame{
 	private SQLGui sqlgui;
 	JCheckBox chckbxShowBrowser;
 	private JTextField txt2DefineInputPath;
-	
+	JRadioButton rdbtnKaoEtAl;
 	public Gui() throws Exception {
 		getContentPane().setLayout(null);
 		
@@ -442,6 +442,8 @@ public class Gui extends JFrame{
 					
 					if(rdbtnAlexnet.isSelected())
 						nettype = NetworkType.AlexNet;
+					if(rdbtnKaoEtAl.isSelected())
+						nettype = NetworkType.Kao;
 					
 					//ConvolutionalNeuralNetwork.load(path);
 					boolean showinbrowser =  chckbxShowBrowser.isSelected();
@@ -590,7 +592,7 @@ public class Gui extends JFrame{
 		panel_4.add(rdbtnGoogleNet);
 		
 		 rdbtnAlexnet = new JRadioButton("AlexNet");
-		rdbtnAlexnet.setBounds(223, 19, 109, 23);
+		rdbtnAlexnet.setBounds(223, 19, 68, 23);
 		panel_4.add(rdbtnAlexnet);
 		
 		JPanel panel_3 = new JPanel();
@@ -728,6 +730,11 @@ public class Gui extends JFrame{
 		btG.add(rdbtnGoogleNet);
 		btG.add(rdbtnOwn);
 		
+		 rdbtnKaoEtAl = new JRadioButton("Kao et al.");
+		rdbtnKaoEtAl.setBounds(293, 19, 109, 23);
+		panel_4.add(rdbtnKaoEtAl);
+		
+		btG.add(rdbtnKaoEtAl);
 		 chckbxShowBrowser = new JCheckBox("Show models in browser");
 		chckbxShowBrowser.setSelected(true);
 		chckbxShowBrowser.setBounds(10, 162, 172, 23);
