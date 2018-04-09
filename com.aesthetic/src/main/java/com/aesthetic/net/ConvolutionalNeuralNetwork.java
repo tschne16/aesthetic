@@ -165,12 +165,12 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 	public static MultiLayerNetwork Kao() {
 		Map<Integer, Double> lrSchedule = new HashMap<>();
 		lrSchedule.put(0, 0.1); // iteration #, learning rate
-		lrSchedule.put(200, 0.01);
-		lrSchedule.put(600, 0.001);
-		lrSchedule.put(800, 0.0001);
-		lrSchedule.put(1000, 0.00001);
+		lrSchedule.put(500, 0.01);
+		lrSchedule.put(1000, 0.001);
+		lrSchedule.put(1500, 0.0001);
+		lrSchedule.put(2000, 0.00001);
 
-		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed).iterations(1)
+		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed).iterations(1).inferenceWorkspaceMode(WorkspaceMode.SINGLE).trainingWorkspaceMode(WorkspaceMode.SINGLE)
 				.regularization(false).l2(0.0005).learningRate(.01).learningRateDecayPolicy(LearningRatePolicy.Schedule)
 				.learningRateSchedule(lrSchedule) // overrides the rate set in learningRate
 				.weightInit(WeightInit.DISTRIBUTION).dist(new NormalDistribution(0.0, 0.01))
@@ -210,6 +210,9 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 				.setInputType(InputType.convolutional(height, width, 3)) // InputType.convolutional for normal image
 				.backprop(true).pretrain(false).build();
 
+		conf.setInferenceWorkspaceMode(WorkspaceMode.SINGLE);
+		conf.setTrainingWorkspaceMode(WorkspaceMode.SINGLE);
+				
 		return new MultiLayerNetwork(conf);
 
 	}
@@ -994,6 +997,9 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			network = Kao();
 		}
 
+		
+		
+		
 		// zooModel.init();
 
 		// File model = new
