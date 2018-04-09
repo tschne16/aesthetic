@@ -41,6 +41,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.aesthetic.main.CreateImage;
 import com.aesthetic.main.DBHelper;
 import com.aesthetic.main.FlickrCrawler;
 import com.aesthetic.net.AVAStructureGeneratior;
@@ -72,6 +73,7 @@ public class Gui extends JFrame{
 	private String trainingsdata_path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\train data";
 	private String testdata_path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\test data";
 	private String output_path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\model";
+	private String inputpath2 = "";
 	private String model_path = "";
 	private String try_images = "";
 	private JTextField textField_traingingsdata_path;
@@ -84,6 +86,10 @@ public class Gui extends JFrame{
 	private JRadioButton rdbtnOwn;
 	private ButtonGroup btG;
 	private ProgressGui pg;
+	private SQLGui sqlgui;
+	JCheckBox chckbxShowBrowser;
+	private JTextField txt2DefineInputPath;
+	
 	public Gui() throws Exception {
 		getContentPane().setLayout(null);
 		
@@ -216,6 +222,19 @@ public class Gui extends JFrame{
 		
 		
 		JButton btnCreate = new JButton("Create");
+		btnCreate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sqlgui = new SQLGui(Gui.this);
+				
+				sqlgui.setDefaultCloseOperation(pg.HIDE_ON_CLOSE);
+				sqlgui.setSize(400,400);
+				sqlgui.setLocation(140,140);
+				sqlgui.setVisible(true);
+				
+				
+				
+			}
+		});
 		btnCreate.setBounds(338, 7, 89, 23);
 		getContentPane().add(btnCreate);
 		
@@ -258,7 +277,7 @@ public class Gui extends JFrame{
 		});
 		
 		txtDefinePath = new JTextField();
-		txtDefinePath.setText("define path");
+		txtDefinePath.setText("define output path");
 		txtDefinePath.setColumns(10);
 		
 		JButton btnNewButton_1 = new JButton("...");
@@ -303,6 +322,54 @@ public class Gui extends JFrame{
 				}
 			}
 		});
+		
+		txt2DefineInputPath = new JTextField();
+		txt2DefineInputPath.setText("define input path");
+		txt2DefineInputPath.setColumns(10);
+		
+		JButton btn_2_inputpath = new JButton("...");
+		btn_2_inputpath.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+		        
+			    chooser = new JFileChooser(); 
+			    chooser.setCurrentDirectory(new java.io.File("."));
+			    chooser.setDialogTitle("Chose Storage");
+			    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			    //
+			    // disable the "All files" option.
+			    //
+			    chooser.setAcceptAllFileFilterUsed(false);
+			    //    
+			    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
+			      
+			    	inputpath2 = chooser.getSelectedFile().getPath();
+			    	txt2DefineInputPath.setText(inputpath2);
+			      }
+			    else {
+			      inputpath2 = "";
+			      }	
+			}
+		});
+		
+		JButton btnCrop = new JButton("Crop");
+		btnCrop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				
+				if(new File(path).exists() && new File(inputpath2).exists())
+				{
+				CreateImage.cropImages(inputpath2,path, 100, 100);
+				JOptionPane.showMessageDialog(null, "Done!");
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null, "Please define all Paths!");
+					return;
+				}
+				
+			}
+		});
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -312,27 +379,41 @@ public class Gui extends JFrame{
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addComponent(txtDefinePath, GroupLayout.PREFERRED_SIZE, 221, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
-							.addComponent(btnAva))
-						.addComponent(btnNewButton, Alignment.TRAILING))
+							.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addComponent(txt2DefineInputPath, GroupLayout.PREFERRED_SIZE, 221, GroupLayout.PREFERRED_SIZE)
+							.addGap(6)
+							.addComponent(btn_2_inputpath, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnCrop, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
+						.addGroup(Alignment.TRAILING, gl_panel_1.createParallelGroup(Alignment.LEADING)
+							.addComponent(btnAva)
+							.addComponent(btnNewButton)))
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 								.addComponent(txtDefinePath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(btnNewButton_1))
-							.addContainerGap())
-						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.UNRELATED))
+						.addGroup(gl_panel_1.createSequentialGroup()
 							.addComponent(btnNewButton)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnAva)
-							.addGap(12))))
+							.addPreferredGap(ComponentPlacement.RELATED)))
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addGap(1)
+							.addComponent(txt2DefineInputPath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+							.addComponent(btn_2_inputpath)
+							.addComponent(btnCrop))))
 		);
 		panel_1.setLayout(gl_panel_1);
 		
@@ -363,7 +444,7 @@ public class Gui extends JFrame{
 						nettype = NetworkType.AlexNet;
 					
 					//ConvolutionalNeuralNetwork.load(path);
-					boolean showinbrowser = chckbxStore.isSelected();
+					boolean showinbrowser =  chckbxShowBrowser.isSelected();
 					 pg = new ProgressGui(Gui.this);
 					pg.setDefaultCloseOperation(pg.HIDE_ON_CLOSE);
 					pg.setSize(560,560);
@@ -647,7 +728,7 @@ public class Gui extends JFrame{
 		btG.add(rdbtnGoogleNet);
 		btG.add(rdbtnOwn);
 		
-		JCheckBox chckbxShowBrowser = new JCheckBox("Show models in browser");
+		 chckbxShowBrowser = new JCheckBox("Show models in browser");
 		chckbxShowBrowser.setSelected(true);
 		chckbxShowBrowser.setBounds(10, 162, 172, 23);
 		panel_2.add(chckbxShowBrowser);

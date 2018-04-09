@@ -1,6 +1,6 @@
 package com.aesthetic.net;
 
 public enum NetworkType {
-	OWN,GoogleNet,AlexNet
+	OWN,GoogleNet,AlexNet,Kao
 
 }

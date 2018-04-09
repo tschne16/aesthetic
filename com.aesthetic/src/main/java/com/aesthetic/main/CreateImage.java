@@ -2,18 +2,38 @@ package com.aesthetic.main;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.FilenameUtils;
+import org.imgscalr.Scalr;
+
 public class CreateImage {
 
-	
+	static final String[] EXTENSIONS = new String[]{
+	        "gif", "png", "bmp","jpg" // and other formats you need
+	    };
+	static final FilenameFilter IMAGE_FILTER = new FilenameFilter() {
+
+        @Override
+        public boolean accept(final File dir, final String name) {
+            for (final String ext : EXTENSIONS) {
+                if (name.endsWith("." + ext)) {
+                    return (true);
+                }
+            }
+            return (false);
+        }
+    };
+    
 	public static void main(String[] args)
 	{
 		
@@ -103,6 +123,64 @@ public class CreateImage {
 	}
 	
 	
-	
+	public static void cropImages(String originalpath,String targetpath,int height,int width)
+	{
+
+		File origin = new File(originalpath);
+		
+		File target = new File(targetpath);
+		target.mkdirs();
+		///Für jeden Ordner im Verzeichnis im Zielverzeichnis einen Ordner anlegen
+		String[] directories = origin.list(new FilenameFilter() {
+			  @Override
+			  public boolean accept(File current, String name) {
+			    return new File(current, name).isDirectory();
+			  }
+			});
+			
+		if(directories.length > 0)
+		{
+			for(String s : directories)
+			{
+			String orgpath = originalpath + "\\" + s;
+			String tarpath = targetpath + "\\" + s;
+			cropImages(orgpath, tarpath, height, width);
+			}
+		}
+		else
+		{
+			for (final File f : origin.listFiles(IMAGE_FILTER)) {
+                BufferedImage img = null;
+                
+                try {
+ 
+                    img = ImageIO.read(f);
+                    BufferedImage result = Scalr.crop(img,      	    (img.getWidth() - width) / 2, (img.getHeight() - height) / 2,
+                    	    width, height);
+                    String name = f.getName();
+                    
+                    File outputfile = new File(targetpath + "\\" + name);
+                    ImageIO.write(result, FilenameUtils.getExtension(f.getName()), outputfile);
+                    
+                    img.flush();
+                    img = null;
+                    result.flush();
+                    result  = null;
+                    
+                    
+                }
+                catch(Exception e)
+                {
+                	System.out.println(e.getMessage());
+                }
+		}
+		
+		
+		
+		
+		
+	}
 	
 }
+	}
+	

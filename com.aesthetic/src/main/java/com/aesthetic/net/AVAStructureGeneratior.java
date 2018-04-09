@@ -22,14 +22,14 @@ import com.google.common.io.Files;
 
 public class AVAStructureGeneratior {
 	
-	public static void OrganizeAva(String path) throws Exception
+	public static void OrganizeAva(String inputpath) throws Exception
 	{
         StringBuilder sb = new StringBuilder();
         BufferedReader br = null;
         
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("0", "");
-		br = new BufferedReader(new FileReader(path + "\\tags.txt"));
+		br = new BufferedReader(new FileReader(inputpath + "\\tags.txt"));
 		String line;
 		while ((line = br.readLine()) != null) {
 			String[] parts = line.split(" ");
@@ -43,7 +43,7 @@ public class AVAStructureGeneratior {
 		br.close();
 		
 		
-        br = new BufferedReader(new FileReader(path + "\\AVA.txt"));
+        br = new BufferedReader(new FileReader(inputpath + "\\AVA.txt"));
 		
 		int counter = 0;
 		
@@ -96,7 +96,7 @@ public class AVAStructureGeneratior {
             }
         }
         
-        	FolderSystemTwoSplit(path);
+        	FolderSystemTwoSplit(inputpath);
 	}
 
 
@@ -105,25 +105,6 @@ public class AVAStructureGeneratior {
 		String org_path = path + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "images";
 		path = path + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "images" + System.getProperty("file.separator") + "Datensatz RAPID" ;
 		
-		/*JFileChooser chooser = new JFileChooser(); 
-	    chooser.setCurrentDirectory(new java.io.File("."));
-	    chooser.setDialogTitle("Chose Image Location");
-	    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	    //
-	    // disable the "All files" option.
-	    //
-	    chooser.setAcceptAllFileFilterUsed(false);
-	    //    
-	    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
-	      
-	    	path = chooser.getSelectedFile().getPath();
-	    	
-	      }
-	    else {
-	      return;
-	      }	
-		
-		*/
 		
 		Random rng = new Random();
 

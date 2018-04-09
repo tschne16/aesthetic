@@ -2,6 +2,8 @@ package com.aesthetic.main;
 
 
 
+import javax.swing.UIManager;
+
 import com.aesthetic.gui.Gui;
 
 public class Main {
@@ -10,7 +12,7 @@ public class Main {
 		// TODO Auto-generated method stub
 		
 		
-		
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		Gui g = new Gui();
 		g.setDefaultCloseOperation(g.EXIT_ON_CLOSE);
 
