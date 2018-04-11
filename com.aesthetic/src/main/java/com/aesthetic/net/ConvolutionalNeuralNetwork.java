@@ -772,7 +772,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		// {
 		// builder.dist(new NormalDistribution(0.0, 0.01));
 		// }
-
+		builder.inferenceWorkspaceMode(WorkspaceMode.SINGLE);
+		builder.trainingWorkspaceMode(WorkspaceMode.SINGLE);
 		builder.iterations(1);
 		builder.learningRate(0.001);
 		//builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
@@ -1061,6 +1062,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 
 					if (networkType == NetworkType.OWN) {
 						network = own(i, weightinit, optialgo);
+						Nd4j.getMemoryManager().setAutoGcWindow(5000);
 						// network = Kao();
 						network.init();
 					}
