@@ -763,12 +763,12 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		double dropOut = 0.5;
 
 		// ZU probierende Learningrates
-		Map<Integer, Double> lrSchedule = new HashMap<>();
+		/*Map<Integer, Double> lrSchedule = new HashMap<>();
 		lrSchedule.put(1, 0.05);
 		lrSchedule.put(200, 0.01);
 		lrSchedule.put(300, 0.001);
 		lrSchedule.put(500, 0.0001);
-		lrSchedule.put(600, 0.00001);
+		lrSchedule.put(600, 0.00001);*/
 		NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
 		builder.seed(seed);
 		// builder.weightInit(weight);
