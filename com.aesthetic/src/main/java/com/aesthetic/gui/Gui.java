@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -87,6 +89,11 @@ public class Gui extends JFrame{
 	private ButtonGroup btG;
 	private ProgressGui pg;
 	private SQLGui sqlgui;
+	private int epochs = 30;
+	private int batchsize = 15;
+	private int cnn_max = 5;
+	private int cnn_min = 1;
+	ParamGui param = null;
 	JCheckBox chckbxShowBrowser;
 	private JTextField txt2DefineInputPath;
 	JRadioButton rdbtnKaoEtAl;
@@ -456,7 +463,10 @@ public class Gui extends JFrame{
 					
 					
 					conv_worker = new ConvolutionalNeuralNetwork(trainingsdata_path, testdata_path, output_path, pg, nettype,showinbrowser);
-					
+					conv_worker.setBatchSize(batchsize);
+					conv_worker.setCnn_min(cnn_min);
+					conv_worker.setCnn_max(cnn_max);
+					conv_worker.setEpochscounter(epochs);
 					conv_worker.execute();
 					//ConvolutionalNeuralNetwork.newTry(trainingsdata_path, testdata_path,output_path,nettype);
 				} catch ( Exception e1) {
@@ -466,7 +476,7 @@ public class Gui extends JFrame{
 				
 			}
 		});
-		btnNewButton_2.setBounds(244, 162, 163, 23);
+		btnNewButton_2.setBounds(296, 162, 111, 23);
 		panel_2.add(btnNewButton_2);
 		
 		textField_traingingsdata_path = new JTextField();
@@ -737,8 +747,52 @@ public class Gui extends JFrame{
 		btG.add(rdbtnKaoEtAl);
 		 chckbxShowBrowser = new JCheckBox("Show models in browser");
 		chckbxShowBrowser.setSelected(true);
-		chckbxShowBrowser.setBounds(10, 162, 172, 23);
+		chckbxShowBrowser.setBounds(10, 162, 141, 23);
 		panel_2.add(chckbxShowBrowser);
+		
+		JCheckBox chckbxparams = new JCheckBox("use own parameter");
+		chckbxparams.addItemListener(new ItemListener() {
+			
+
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				if(arg0.getStateChange() == ItemEvent.DESELECTED)
+				{
+					epochs = 30;
+					batchsize = 15;
+					cnn_max = 5;
+					cnn_min = 1;
+					return;	
+				}
+				
+					param = new ParamGui(Gui.this,cnn_min,cnn_max,epochs,batchsize);
+					
+					param.setDefaultCloseOperation(param.HIDE_ON_CLOSE);
+					param.setSize(400,400);
+					param.setLocation(140,140);
+					param.setVisible(true);
+					
+					if(param.isSuccess())
+					{
+						if(param.getCnn_min()<=param.getCnn_max())
+						{
+						cnn_min = param.getCnn_min();
+						cnn_max = param.getCnn_max();
+						}
+						batchsize = param.getBatchsize();
+						epochs = param.getEpochs();
+					}
+					
+					param.dispose();
+				}
+		});
+		
+	
+		
+		chckbxparams.setBounds(162, 162, 128, 23);
+		panel_2.add(chckbxparams);
 		
 		
 	}

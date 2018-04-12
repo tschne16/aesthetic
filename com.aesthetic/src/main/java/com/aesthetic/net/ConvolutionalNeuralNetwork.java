@@ -123,9 +123,20 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 	protected static long seed = 42;
 	protected static Random rng = new Random(seed);
 	protected static double splitTrainTest = 0.8;
-	static int batchSize = 60;
-	static int epochscounter = 30;
+	private static int batchSize = 60;
+	
+	
+	public static int getBatchSize() {
+		return batchSize;
+	}
 
+	public static void setBatchSize(int batchSize) {
+		ConvolutionalNeuralNetwork.batchSize = batchSize;
+	}
+
+	private int epochscounter = 30;
+	private int cnn_min = 1;
+	private int cnn_max = 5;
 	// private static final long seed = 12345;
 
 	private static final Random randNumGen = new Random(seed);
@@ -777,7 +788,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		builder.iterations(1);
 		builder.learningRate(0.001);
 		//builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
-		builder.learningRateSchedule(lrSchedule);
+		//builder.learningRateSchedule(lrSchedule);
 		// builder.updater(Updater.NESTEROVS);
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		builder.updater(new Nesterovs(0.9));
@@ -1022,7 +1033,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		// algo[1] = OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT;
 
 		/// ANZAHL SCHICHTEN
-		for (int i = 4; i <= 6; i++) {
+		for (int i = cnn_min; i <= cnn_max; i++) {
 			
 			publish("Number of additional Layers:" + i);
 
@@ -1381,6 +1392,30 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 
 		}
 
+	}
+
+	public int getCnn_min() {
+		return cnn_min;
+	}
+
+	public void setCnn_min(int cnn_min) {
+		this.cnn_min = cnn_min;
+	}
+
+	public int getCnn_max() {
+		return cnn_max;
+	}
+
+	public void setCnn_max(int cnn_max) {
+		this.cnn_max = cnn_max;
+	}
+
+	public int getEpochscounter() {
+		return epochscounter;
+	}
+
+	public void setEpochscounter(int epochscounter) {
+		this.epochscounter = epochscounter;
 	}
 
 }
