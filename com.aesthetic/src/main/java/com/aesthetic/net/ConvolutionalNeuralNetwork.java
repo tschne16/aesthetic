@@ -650,7 +650,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			int[] predict = network.predict(image);
 			String modelResult = "";//"Prediction: ";
 
-			modelResult = modelResult + Integer.toString(predict[0]);
+			modelResult = modelResult + classes[predict[0]];
 
 			/*
 			 * for(int i = 0; i < predict.length;i++) { if(i < labels.size()) { modelResult
