@@ -1,6 +1,8 @@
 package com.aesthetic.net;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -11,6 +13,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 
 	private JTextArea JDP;
 	private JLabel jlabel;
+	private JLabel additional;
 	private int batchsize = 15;
 	private int cnn_min = 1;
 	private int cnn_max = 6;
@@ -22,7 +25,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	final static String newline = "\n";
 	private int epochs;
 	private List<Double> accuracies;
-	
+	private double bestaccuracy;
 	@Override
 	protected Void doInBackground() throws Exception {
 		accuracies = new ArrayList<Double>();
@@ -34,10 +37,17 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 			t.start();
 			publish("Waiting for Results");
 			t.join();
-			publish("Got it");
 			accuracies.add(convnet.getAccuracy());
 			publish("ACCURACY " + Double.toString(convnet.getAccuracy()));
 			publish(convnet.getConfusionmatrix());
+			
+			if(bestaccuracy < convnet.getAccuracy())
+			{
+				bestaccuracy = convnet.getAccuracy();
+				jlabel.setText(Double.toString(bestaccuracy));
+				additional.setText(Integer.toString(i));
+			}
+			
 			convnet = null;
 			publish("RESTING A BIT....");
 			Thread.sleep(5000);
@@ -53,7 +63,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 
 
 	public ConvolutionalNetManager(JTextArea jDP, JLabel jlabel, int batchsize, int cnn_min, int cnn_max,
-			String train_path, String test_path, String model_path, NetworkType nettype, boolean showinb, int epochs) {
+			String train_path, String test_path, String model_path, NetworkType nettype, boolean showinb, int epochs,JLabel add) {
 		super();
 		JDP = jDP;
 		this.jlabel = jlabel;
@@ -66,6 +76,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		this.nettype = nettype;
 		this.showinb = showinb;
 		this.epochs = epochs;
+		this.additional = add;
 	}
 
 
@@ -76,10 +87,12 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	@Override
 	protected void process(List<String> chunks) {
 
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+
 		for (String text : chunks) {
 
 			try {
-				JDP.append(text);
+				JDP.append(timeStamp + ": " + text);
 				JDP.append(newline);
 				//jlabel.setText(Double.toString(accuracy));
 			} catch (Exception e) {

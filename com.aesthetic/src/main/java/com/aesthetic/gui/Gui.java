@@ -472,7 +472,7 @@ public class Gui extends JFrame{
 					conv_worker.execute();*/
 					
 					
-					convnetmanager = new ConvolutionalNetManager(pg.getTextArea(), pg.getLblWert(), batchsize, cnn_min, cnn_max, trainingsdata_path, testdata_path, output_path, nettype, showinbrowser, epochs);
+					convnetmanager = new ConvolutionalNetManager(pg.getTextArea(), pg.getLblWert(), batchsize, cnn_min, cnn_max, trainingsdata_path, testdata_path, output_path, nettype, showinbrowser, epochs,pg.getLabel_numberLayer());
 					convnetmanager.execute();
 					
 					

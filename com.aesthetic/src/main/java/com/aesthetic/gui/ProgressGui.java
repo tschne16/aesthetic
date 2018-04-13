@@ -36,6 +36,8 @@ public class ProgressGui extends JDialog {
 
 	private JLabel lblBestAccuracy;
 	private JLabel lblWert;
+	private JLabel lblOfAdditional;
+	private JLabel label_numberLayer;
 	public ProgressGui(Gui gui) {
 		
 		super(gui);
@@ -62,13 +64,29 @@ public class ProgressGui extends JDialog {
 		 scrollPane.setBounds(10, 47, 520, 446);
 		 getContentPane().add(scrollPane);
 		 
+		 lblOfAdditional = new JLabel("# of additional layer:");
+		 lblOfAdditional.setBounds(202, 11, 107, 14);
+		 getContentPane().add(lblOfAdditional);
+		 
+		 label_numberLayer = new JLabel("0");
+		 label_numberLayer.setBounds(319, 11, 75, 14);
+		 getContentPane().add(label_numberLayer);
 		 
 		 
 		 
+		 
 		
 		
 		
 		
+	}
+
+	public JLabel getLabel_numberLayer() {
+		return label_numberLayer;
+	}
+
+	public void setLabel_numberLayer(JLabel label_numberLayer) {
+		this.label_numberLayer = label_numberLayer;
 	}
 
 	public JLabel getLblWert() {

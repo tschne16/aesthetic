@@ -586,7 +586,7 @@ public class ThreadNet implements Runnable {
 
 	@Override
 	public void run() {
-
+LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 		int rngseed = 123;
 		int outputnum = 2;
 		Random RandNumGen = new Random(rngseed);
