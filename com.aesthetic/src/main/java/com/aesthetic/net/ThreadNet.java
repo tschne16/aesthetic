@@ -738,132 +738,133 @@ public class ThreadNet implements Runnable {
 					}
 					testSet = null;
 					// System.out.println(testSet.getLabels().sum(0));
-				
+
 				} catch (Exception e) {
 					LOGGER.info("FAILED to train Network! " + e.getMessage());
 				}
 			}
-				recordReader.reset();
-				try {
-					recordReader.initialize(test);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
-				scaler.fit(testIter);
-				testIter.setPreProcessor(scaler);
-				Evaluation eval = new Evaluation(2);
-
-				if (networkType != NetworkType.GoogleNet) {
-					eval = network.evaluate(testIter);
-				} else {
-					eval = googlenet.evaluate(testIter);
-				}
-
-				LOGGER.info(eval.stats());
-
-				LOGGER.info(Double.toString(eval.accuracy()));
-
-				PrintWriter writer = null;
-				;
-				try {
-					int zaehler = 1;
-					File create = new File(output_path + "\\Textfiles");
-					create.mkdirs();
-					String txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
-					while (new File(txt_pfad).exists()) {
-						zaehler++;
-						txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
-					}
-					if (eval.accuracy() > accuracy) {
-
-						bestNetwork = txt_pfad;
-
-						accuracy = eval.accuracy();
-						LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
-
-					}
-					writer = new PrintWriter(txt_pfad, "UTF-8");
-					// writer.println("Anzahl CNN LAYER :" + i);
-					writer.println("BatchSize :" + batchSize);
-					writer.println("Accurancy:" + eval.accuracy());
-					writer.println("Confusion Matrix:" + eval.getConfusionMatrix());
-					writer.println("------");
-					writer.println("Updater: " + network.getUpdater().toString());
-					// writer.println("WeightInit:" + weightinit.toString());
-					NeuralNetConfiguration netconf = network.conf();
-					writer.println("LEARNING RATE POLICY:" + netconf.getLearningRatePolicy().toString());
-					writer.println("SEED:" + seed);
-					// writer.println("OptimizationAlgo:" + optialgo.toString());
-					writer.close();
-					writer = null;
-
-				} catch (Exception e) {
-					if (writer != null) {
-						writer.close();
-					}
-
-					LOGGER.info(e.getMessage());
-				}
-
-				try {
-					// Model m = result.getBestModel();
-
-					int counter = 0;
-					String tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
-					while (new File(tmp_model_path).exists()) {
-						counter++;
-						tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
-					}
-
-					if (networkType != NetworkType.GoogleNet) {
-						ModelSerializer.writeModel(network, new File(tmp_model_path), true);
-					} else {
-						ModelSerializer.writeModel(googlenet, new File(tmp_model_path), true);
-					}
-
-					/// LABELS ZU DER ZIP DATEI HINZUFÜGEN
-
-					addLabelsToZipFolder(labels, new File(tmp_model_path));
-
-					/////
-
-					/// HIER AUCH DAS GANZE NETZ ABSPEICHERN
-				} catch (Exception e) {
-					LOGGER.info("NOT SAVED : " + e.getMessage());
-				}
-
-				// network = null;
-
-				try {
-					recordReader.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					recordReader_Test.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				recordReader = null;
-				recordReader_Test = null;
-				eval = null;
-				dataIter = null;
-				dataIter_test = null;
-				scaler = null;
-				labelMaker = null;
-				// optialgo = null;
-				test = null;
-				train = null;
-				testData = null;
-				trainData = null;
-				network = null;
-				/// NUR WEITER OPTIMIEREN WENN OWN
-			
 		}
+		
+		recordReader.reset();
+		try {
+			recordReader.initialize(test);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
+		scaler.fit(testIter);
+		testIter.setPreProcessor(scaler);
+		Evaluation eval = new Evaluation(2);
+
+		if (networkType != NetworkType.GoogleNet) {
+			eval = network.evaluate(testIter);
+		} else {
+			eval = googlenet.evaluate(testIter);
+		}
+
+		LOGGER.info(eval.stats());
+
+		LOGGER.info(Double.toString(eval.accuracy()));
+
+		PrintWriter writer = null;
+		;
+		try {
+			int zaehler = 1;
+			File create = new File(output_path + "\\Textfiles");
+			create.mkdirs();
+			String txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
+			while (new File(txt_pfad).exists()) {
+				zaehler++;
+				txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
+			}
+			if (eval.accuracy() > accuracy) {
+
+				bestNetwork = txt_pfad;
+
+				accuracy = eval.accuracy();
+				LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
+
+			}
+			writer = new PrintWriter(txt_pfad, "UTF-8");
+			// writer.println("Anzahl CNN LAYER :" + i);
+			writer.println("BatchSize :" + batchSize);
+			writer.println("Accurancy:" + eval.accuracy());
+			writer.println("Confusion Matrix:" + eval.getConfusionMatrix());
+			writer.println("------");
+			writer.println("Updater: " + network.getUpdater().toString());
+			// writer.println("WeightInit:" + weightinit.toString());
+			NeuralNetConfiguration netconf = network.conf();
+			writer.println("LEARNING RATE POLICY:" + netconf.getLearningRatePolicy().toString());
+			writer.println("SEED:" + seed);
+			// writer.println("OptimizationAlgo:" + optialgo.toString());
+			writer.close();
+			writer = null;
+
+		} catch (Exception e) {
+			if (writer != null) {
+				writer.close();
+			}
+
+			LOGGER.info(e.getMessage());
+		}
+
+		try {
+			// Model m = result.getBestModel();
+
+			int counter = 0;
+			String tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
+			while (new File(tmp_model_path).exists()) {
+				counter++;
+				tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
+			}
+
+			if (networkType != NetworkType.GoogleNet) {
+				ModelSerializer.writeModel(network, new File(tmp_model_path), true);
+			} else {
+				ModelSerializer.writeModel(googlenet, new File(tmp_model_path), true);
+			}
+
+			/// LABELS ZU DER ZIP DATEI HINZUFÜGEN
+
+			addLabelsToZipFolder(labels, new File(tmp_model_path));
+
+			/////
+
+			/// HIER AUCH DAS GANZE NETZ ABSPEICHERN
+		} catch (Exception e) {
+			LOGGER.info("NOT SAVED : " + e.getMessage());
+		}
+
+		// network = null;
+
+		try {
+			recordReader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			recordReader_Test.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		recordReader = null;
+		recordReader_Test = null;
+		eval = null;
+		dataIter = null;
+		dataIter_test = null;
+		scaler = null;
+		labelMaker = null;
+		// optialgo = null;
+		test = null;
+		train = null;
+		testData = null;
+		trainData = null;
+		network = null;
+		/// NUR WEITER OPTIMIEREN WENN OWN
+
 	}
 
 	public int getCnn_min() {
