@@ -18,6 +18,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	private String model_path;
 	private NetworkType nettype;
 	private boolean showinb;
+	final static String newline = "\n";
 	private int epochs;
 	@Override
 	protected Void doInBackground() throws Exception {
@@ -25,14 +26,14 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		for(int i = cnn_min; cnn_min<= cnn_max;i++)
 		{
 			ThreadNet convnet = new ThreadNet(train_path,test_path,model_path,nettype,showinb,i,batchsize,epochs);
-			
-			Thread t = new Thread(convnet);
 			publish("STARTING");
+			Thread t = new Thread(convnet);
 			t.start();
 			publish("Waiting for Results");
 			t.join();
 			publish("Got it");
-			publish(Double.toString(convnet.getAccuracy()));
+			publish("ACCURACY " + Double.toString(ThreadNet.getAccuracy()));
+			publish(convnet.getConfusionmatrix());
 			convnet = null;
 			publish("RESTING A BIT....");
 			Thread.sleep(5000);
@@ -75,6 +76,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 
 			try {
 				JDP.append(text);
+				JDP.append(newline);
 				//jlabel.setText(Double.toString(accuracy));
 			} catch (Exception e) {
 

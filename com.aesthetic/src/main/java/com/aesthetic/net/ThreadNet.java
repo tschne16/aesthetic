@@ -153,6 +153,7 @@ public class ThreadNet implements Runnable {
 	private String output_path = "";
 	private NetworkType networkType;
 	private int amountoflayers;
+	private String confusionmatrix;
 	private boolean showinbrowser = true;
 
 	public static void main(String[] args) {
@@ -783,6 +784,7 @@ public class ThreadNet implements Runnable {
 				bestNetwork = txt_pfad;
 
 				accuracy = eval.accuracy();
+				confusionmatrix = eval.getConfusionMatrix().toString();
 				LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
 
 			}
@@ -897,6 +899,14 @@ public class ThreadNet implements Runnable {
 
 	public static void setAccuracy(double accuracy) {
 		ThreadNet.accuracy = accuracy;
+	}
+
+	public String getConfusionmatrix() {
+		return confusionmatrix;
+	}
+
+	public void setConfusionmatrix(String confusionmatrix) {
+		this.confusionmatrix = confusionmatrix;
 	}
 
 }
