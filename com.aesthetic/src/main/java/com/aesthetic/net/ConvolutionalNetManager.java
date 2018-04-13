@@ -1,5 +1,6 @@
 package com.aesthetic.net;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -20,9 +21,11 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	private boolean showinb;
 	final static String newline = "\n";
 	private int epochs;
+	private List<Double> accuracies;
+	
 	@Override
 	protected Void doInBackground() throws Exception {
-		
+		accuracies = new ArrayList<Double>();
 		for(int i = cnn_min; cnn_min<= cnn_max;i++)
 		{
 			ThreadNet convnet = new ThreadNet(train_path,test_path,model_path,nettype,showinb,i,batchsize,epochs);
@@ -32,6 +35,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 			publish("Waiting for Results");
 			t.join();
 			publish("Got it");
+			accuracies.add(ThreadNet.getAccuracy());
 			publish("ACCURACY " + Double.toString(ThreadNet.getAccuracy()));
 			publish(convnet.getConfusionmatrix());
 			convnet = null;

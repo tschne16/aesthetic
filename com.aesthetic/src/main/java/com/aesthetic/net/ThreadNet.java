@@ -153,7 +153,7 @@ public class ThreadNet implements Runnable {
 	private String output_path = "";
 	private NetworkType networkType;
 	private int amountoflayers;
-	private String confusionmatrix;
+	private static String confusionmatrix;
 	private boolean showinbrowser = true;
 
 	public static void main(String[] args) {
@@ -901,12 +901,12 @@ public class ThreadNet implements Runnable {
 		ThreadNet.accuracy = accuracy;
 	}
 
-	public String getConfusionmatrix() {
+	public static String getConfusionmatrix() {
 		return confusionmatrix;
 	}
 
-	public void setConfusionmatrix(String confusionmatrix) {
-		this.confusionmatrix = confusionmatrix;
+	public static void setConfusionmatrix(String confusionmatrix) {
+		ThreadNet.confusionmatrix = confusionmatrix;
 	}
 
 }
