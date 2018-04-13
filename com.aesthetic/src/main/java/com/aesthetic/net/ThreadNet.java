@@ -690,7 +690,7 @@ public class ThreadNet implements Runnable {
 
 		if (networkType == NetworkType.OWN) {
 			network = null;
-
+			LOGGER.info("BUILD MODEL with Layers: " + amountoflayers );
 			network = own(amountoflayers);
 			// Nd4j.getMemoryManager().setAutoGcWindow(5000);
 			network.init();
