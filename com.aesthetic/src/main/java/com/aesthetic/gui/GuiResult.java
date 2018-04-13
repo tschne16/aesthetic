@@ -32,10 +32,10 @@ private JLabel lblPicture;
 		lblKlasse.setBounds(75, 375, 241, 14);
 		getContentPane().add(lblKlasse);
 		
-		boolean visible = true;
+		boolean visible = false;
 		if(results.size()>1)
 		{
-			visible  = false;
+			visible  = true;
 		}
 		
 		it   = results.entrySet().iterator();
