@@ -25,11 +25,11 @@ private JLabel lblPicture;
 		
 		all = results;
 		JLabel lblName = new JLabel("Name");
-		lblName.setBounds(75, 344, 293, 14);
+		lblName.setBounds(10, 344, 414, 14);
 		getContentPane().add(lblName);
 		
 		JLabel lblKlasse = new JLabel("Klasse");
-		lblKlasse.setBounds(75, 375, 241, 14);
+		lblKlasse.setBounds(10, 373, 296, 14);
 		getContentPane().add(lblKlasse);
 		
 		boolean visible = false;

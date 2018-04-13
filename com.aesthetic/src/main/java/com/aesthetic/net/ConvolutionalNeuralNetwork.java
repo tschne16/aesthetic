@@ -621,14 +621,14 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		String[] classes = labels.toArray(new String[labels.size()]);
 		
 		
-		if (labels != null) {
+		/*if (labels != null) {
 			int counter = 0;
 			for (String s : labels) {
 				files.put("Klasse " + s, " entspricht " + counter);
 				counter++;
 			}
 
-		}
+		}*/
 
 		for (File file : images) {
 			NativeImageLoader loader = new NativeImageLoader(height, width, 3);
