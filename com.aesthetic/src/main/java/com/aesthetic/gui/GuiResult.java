@@ -21,11 +21,11 @@ public int counter = 0;
 		
 		all = results;
 		JLabel lblName = new JLabel("Name");
-		lblName.setBounds(75, 344, 46, 14);
+		lblName.setBounds(75, 344, 293, 14);
 		getContentPane().add(lblName);
 		
 		JLabel lblKlasse = new JLabel("Klasse");
-		lblKlasse.setBounds(75, 375, 46, 14);
+		lblKlasse.setBounds(75, 375, 241, 14);
 		getContentPane().add(lblKlasse);
 		
 		
@@ -38,7 +38,7 @@ public int counter = 0;
 		  String erg = "";		    
 
 		        Map.Entry pair = (Map.Entry)it.next(); 
-		        lblName.setText(pair.getKey().toString());
+		        lblName.setText("File");
 		        BufferedImage myPicture = ImageIO.read(new File(pair.getKey().toString()));
 		        
 		        if(myPicture != null )
@@ -47,8 +47,6 @@ public int counter = 0;
 		    		lblPicture.setBounds(25, 23, 301, 300);
 		    		getContentPane().add(lblPicture);
 		        }
-		        
-		        lblKlasse.setText(pair.getValue().toString());
 
 		      //  erg = erg + (pair.getKey() + " " + pair.getValue() + "\n");
 		        //it.remove(); // avoids a ConcurrentModificationException

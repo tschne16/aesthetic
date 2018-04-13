@@ -639,10 +639,10 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			// LOGGER.info(network.getLabels().toString());
 			INDArray output = network.output(image);
 
-			String introduction;
+			
 
 			int[] predict = network.predict(image);
-			String modelResult = "Prediction: ";
+			String modelResult = "";//"Prediction: ";
 
 			modelResult = modelResult + labels.get(predict[0]);
 
@@ -657,8 +657,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			 */
 
 			if (labels == null) {
-				modelResult = output.toString();
-				modelResult += "===" + Arrays.toString(predict);
+				//modelResult = output.toString();
+				//modelResult += "===" + Arrays.toString(predict);
 			}
 			//
 			//
