@@ -32,7 +32,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	@Override
 	protected Void doInBackground() throws Exception {
 		accuracies = new ArrayList<Double>();
-		for(int i = cnn_min; cnn_min<= cnn_max;i++)
+		for(int i = cnn_min; i<= cnn_max;i++)
 		{
 			ThreadNet convnet = new ThreadNet(train_path,test_path,model_path,nettype,showinb,i,batchsize,epochs);
 			
