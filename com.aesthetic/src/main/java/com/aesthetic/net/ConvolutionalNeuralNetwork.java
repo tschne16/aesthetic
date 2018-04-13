@@ -124,8 +124,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 	protected static Random rng = new Random(seed);
 	protected static double splitTrainTest = 0.8;
 	private static int batchSize = 60;
-	
-	
+
 	public static int getBatchSize() {
 		return batchSize;
 	}
@@ -146,7 +145,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 	private static int channels = 3;
 	private static int epochs = 50;
 	private static Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ConvolutionalNeuralNetwork.class);
-	private static Model bestNetwork = null;
+	private static String bestNetwork;
 	private static double accuracy = 0;
 
 	private JTextArea JDP;
@@ -181,7 +180,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		lrSchedule.put(1500, 0.0001);
 		lrSchedule.put(2000, 0.00001);
 
-		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed).iterations(1).inferenceWorkspaceMode(WorkspaceMode.SINGLE).trainingWorkspaceMode(WorkspaceMode.SINGLE)
+		MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder().seed(seed).iterations(1)
+				.inferenceWorkspaceMode(WorkspaceMode.SINGLE).trainingWorkspaceMode(WorkspaceMode.SINGLE)
 				.regularization(false).l2(0.0005).learningRate(.01).learningRateDecayPolicy(LearningRatePolicy.Schedule)
 				.learningRateSchedule(lrSchedule) // overrides the rate set in learningRate
 				.weightInit(WeightInit.DISTRIBUTION).dist(new NormalDistribution(0.0, 0.01))
@@ -221,8 +221,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 				.setInputType(InputType.convolutional(height, width, 3)) // InputType.convolutional for normal image
 				.backprop(true).pretrain(false).build();
 
-		//Nd4j.getMemoryManager().setAutoGcWindow(5000);
-		
+		// Nd4j.getMemoryManager().setAutoGcWindow(5000);
+
 		return new MultiLayerNetwork(conf);
 
 	}
@@ -763,12 +763,11 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		double dropOut = 0.5;
 
 		// ZU probierende Learningrates
-		/*Map<Integer, Double> lrSchedule = new HashMap<>();
-		lrSchedule.put(1, 0.05);
-		lrSchedule.put(200, 0.01);
-		lrSchedule.put(300, 0.001);
-		lrSchedule.put(500, 0.0001);
-		lrSchedule.put(600, 0.00001);*/
+		/*
+		 * Map<Integer, Double> lrSchedule = new HashMap<>(); lrSchedule.put(1, 0.05);
+		 * lrSchedule.put(200, 0.01); lrSchedule.put(300, 0.001); lrSchedule.put(500,
+		 * 0.0001); lrSchedule.put(600, 0.00001);
+		 */
 		NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
 		builder.seed(seed);
 		// builder.weightInit(weight);
@@ -778,7 +777,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		// builder.setMiniBatch(miniBatch);
 		// builder.setUseRegularization(true);
 		builder.regularization(false).l2(0.0005);
-		//builder.convolutionMode(ConvolutionMode.Same);
+		// builder.convolutionMode(ConvolutionMode.Same);
 		// if(weight == WeightInit.DISTRIBUTION)
 		// {
 		// builder.dist(new NormalDistribution(0.0, 0.01));
@@ -787,8 +786,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		builder.trainingWorkspaceMode(WorkspaceMode.SINGLE);
 		builder.iterations(1);
 		builder.learningRate(0.001);
-		//builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
-		//builder.learningRateSchedule(lrSchedule);
+		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
+		// builder.learningRateSchedule(lrSchedule);
 		// builder.updater(Updater.NESTEROVS);
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		builder.updater(new Nesterovs(0.9));
@@ -847,8 +846,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		counter = cnncounter;
 		listbuilder.layer(counter,
 				fullyConnected("ffn" + counter, 500, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
-		listbuilder.layer(counter+1, fullyConnected("ffn" + counter+1, 256,
-		 nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+		listbuilder.layer(counter + 1,
+				fullyConnected("ffn" + counter + 1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
 
 		listbuilder.layer(counter + 1,
 				new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).name("output").nOut(2)
@@ -981,7 +980,6 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		}
 		java.util.Collections.sort(labels);
 
-
 		publish("START EVALUATION!");
 		/*
 		 * for(int i = 1; i < 3;i++) { DataSet ds = dataIter.next();
@@ -1003,15 +1001,10 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			// org.deeplearning4j.zoo.model.GoogLeNet(2, seed, 1).conf());
 			googlenet = new ComputationGraph(new com.aesthetic.net.GoogLeNet(2, seed).conf());
 			googlenet.init();
-		}
-		else if(networkType == NetworkType.Kao)
-		{
+		} else if (networkType == NetworkType.Kao) {
 			network = Kao();
 		}
 
-		
-		
-		
 		// zooModel.init();
 
 		// File model = new
@@ -1034,7 +1027,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 
 		/// ANZAHL SCHICHTEN
 		for (int i = cnn_min; i <= cnn_max; i++) {
-			
+
 			publish("Number of additional Layers:" + i);
 
 			// VORERST OHNE FUNKTION
@@ -1043,7 +1036,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 
 				/// SCHLEIFE VORERST ohne Funktion (algo = 0;)
 				for (int f = 0; f < algo.length; f++) {
-					
+
 					trainData = new File(train_path);
 					testData = new File(test_path);
 					FileSplit train = new FileSplit(trainData, NativeImageLoader.ALLOWED_FORMATS, RandNumGen);
@@ -1060,11 +1053,10 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 					dataIter.setPreProcessor(scaler);
 
 					// ParentPathLabelGenerator labelMaker2 = new ParentPathLabelGenerator();
-					
+
 					ImageRecordReader recordReader_Test = new ImageRecordReader(height, width, channels, labelMaker);
 					recordReader_Test.initialize(test);
-					
-					
+
 					// DataNormalization scaler2 = new ImagePreProcessingScaler(0, 1);
 					DataSetIterator dataIter_test = new RecordReaderDataSetIterator(recordReader, batchSize, 1,
 							outputnum);
@@ -1220,20 +1212,6 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 					 * }
 					 */
 
-					if (eval.accuracy() > accuracy) {
-						
-						if (networkType == NetworkType.GoogleNet)
-							bestNetwork = googlenet;
-						
-						else {
-							bestNetwork = network;
-						}
-						accuracy = eval.accuracy();
-						LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
-						publish("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
-
-					}
-
 					LOGGER.info(eval.stats());
 					publish(eval.stats());
 					LOGGER.info(Double.toString(eval.accuracy()));
@@ -1249,7 +1227,15 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 							zaehler++;
 							txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
 						}
+						if (eval.accuracy() > accuracy) {
 
+							bestNetwork = txt_pfad;
+
+							accuracy = eval.accuracy();
+							LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
+							publish("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
+
+						}
 						writer = new PrintWriter(txt_pfad, "UTF-8");
 						writer.println("Anzahl CNN LAYER :" + i);
 						writer.println("BatchSize :" + batchSize);
@@ -1272,7 +1258,6 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 
 						LOGGER.info(e.getMessage());
 					}
-
 
 					try {
 						// Model m = result.getBestModel();
@@ -1302,9 +1287,9 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 					}
 
 					// network = null;
-					
+
 					recordReader.close();
-					recordReader_Test.close();					
+					recordReader_Test.close();
 					recordReader = null;
 					recordReader_Test = null;
 					eval = null;
@@ -1318,7 +1303,6 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 					testData = null;
 					trainData = null;
 
-
 					/// NUR WEITER OPTIMIEREN WENN OWN
 					if (networkType != NetworkType.OWN) {
 						return null;
@@ -1329,21 +1313,19 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 
 		}
 
-		if (bestNetwork != null) {
-			int counter = 0;
-
-			String tmp_model_path = path_model + "\\modelconfig_best" + counter + ".zip";
-			while (new File(tmp_model_path).exists()) {
-				counter++;
-				tmp_model_path = path_model + "\\modelconfig_best" + counter + ".zip";
-			}
-
-			File bestModel = new File(tmp_model_path);
-			bestModel.mkdirs();
-			ModelSerializer.writeModel(bestNetwork, bestModel, true);
-			LOGGER.info("MODEL STORED:" + tmp_model_path);
-
-		}
+		/*
+		 * if (bestNetwork != null) { int counter = 0;
+		 * 
+		 * String tmp_model_path = path_model + "\\modelconfig_best" + counter + ".zip";
+		 * while (new File(tmp_model_path).exists()) { counter++; tmp_model_path =
+		 * path_model + "\\modelconfig_best" + counter + ".zip"; }
+		 * 
+		 * File bestModel = new File(tmp_model_path); bestModel.mkdirs();
+		 * ModelSerializer.writeModel(bestNetwork, bestModel, true);
+		 * LOGGER.info("MODEL STORED:" + tmp_model_path);
+		 * 
+		 * }
+		 */
 
 		/*
 		 * dataIter.next().shuffle(); for(int i = 0;i < epochscounter;i++) {
@@ -1373,7 +1355,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		 */
 
 		// newTry(train_path, test_path, output_path, networkType);
-	
+
 		return null;
 	}
 
