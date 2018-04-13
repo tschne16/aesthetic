@@ -618,7 +618,9 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(model);
 		HashMap<String, String> files = new HashMap<String, String>();
 		List<String> labels = getLabelsFromModelZip(model);
-
+		String[] classes = labels.toArray(new String[labels.size()]);
+		
+		
 		if (labels != null) {
 			int counter = 0;
 			for (String s : labels) {
@@ -644,7 +646,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			int[] predict = network.predict(image);
 			String modelResult = "";//"Prediction: ";
 
-			modelResult = modelResult + labels.get(predict[0]);
+			modelResult = modelResult + classes[predict[0]];
 
 			/*
 			 * for(int i = 0; i < predict.length;i++) { if(i < labels.size()) { modelResult
