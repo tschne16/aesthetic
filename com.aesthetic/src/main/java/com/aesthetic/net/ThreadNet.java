@@ -148,7 +148,6 @@ public class ThreadNet implements Runnable {
 	private static String bestNetwork;
 	private static double accuracy = 0;
 
-
 	private String train_path = "";
 	private String test_path = "";
 	private String output_path = "";
@@ -161,10 +160,10 @@ public class ThreadNet implements Runnable {
 
 	}
 
-	public ThreadNet(String train, String test, String out, NetworkType nettype,
-			boolean showinb, int amount,int batch, int epoch) {
-		//JDP = proggui.getTextArea();
-		//jlabel = proggui.getLblWert();
+	public ThreadNet(String train, String test, String out, NetworkType nettype, boolean showinb, int amount, int batch,
+			int epoch) {
+		// JDP = proggui.getTextArea();
+		// jlabel = proggui.getLblWert();
 		train_path = train;
 		test_path = test;
 		output_path = out;
@@ -172,7 +171,7 @@ public class ThreadNet implements Runnable {
 		showinbrowser = showinb;
 		amountoflayers = amount;
 		batchSize = batch;
-		epochscounter =  epoch;
+		epochscounter = epoch;
 	}
 
 	public static MultiLayerNetwork Kao() {
@@ -230,7 +229,6 @@ public class ThreadNet implements Runnable {
 
 	}
 
-	
 	public static void addLabelsToZipFolder(List<String> labels, File model) throws Exception {
 
 		if (!model.exists()) {
@@ -299,8 +297,6 @@ public class ThreadNet implements Runnable {
 		zis.close();
 		return null;
 	}
-
-
 
 	public static HashMap<String, String> Try_model(File model, File[] images) throws Exception {
 		//// LOAD MODEL
@@ -535,8 +531,9 @@ public class ThreadNet implements Runnable {
 		counter = cnncounter;
 		listbuilder.layer(counter,
 				fullyConnected("ffn" + counter, 500, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
-	//	listbuilder.layer(counter + 1,
-				//fullyConnected("ffn" + counter + 1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+		// listbuilder.layer(counter + 1,
+		// fullyConnected("ffn" + counter + 1, 256, nonZeroBias, dropOut, new
+		// GaussianDistribution(0, 0.005)));
 
 		listbuilder.layer(counter + 1,
 				new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).name("output").nOut(2)
@@ -548,7 +545,7 @@ public class ThreadNet implements Runnable {
 		MultiLayerConfiguration conf_test = listbuilder.build();
 
 		return new MultiLayerNetwork(conf_test);
-		
+
 	}
 
 	private static ConvolutionLayer convInit(String name, int in, int out, int[] kernel, int[] stride, int[] pad,
@@ -580,7 +577,7 @@ public class ThreadNet implements Runnable {
 
 	@Override
 	public void run() {
-		
+
 		int rngseed = 123;
 		int outputnum = 2;
 		Random RandNumGen = new Random(rngseed);
@@ -630,7 +627,6 @@ public class ThreadNet implements Runnable {
 		}
 		java.util.Collections.sort(labels);
 
-	
 		/*
 		 * for(int i = 1; i < 3;i++) { DataSet ds = dataIter.next();
 		 * System.out.println(ds); System.out.println(dataIter.getLabels()); }
@@ -658,220 +654,217 @@ public class ThreadNet implements Runnable {
 
 		dirFile.mkdir();
 
+		trainData = new File(train_path);
+		testData = new File(test_path);
+		FileSplit train = new FileSplit(trainData, NativeImageLoader.ALLOWED_FORMATS, RandNumGen);
+		FileSplit test = new FileSplit(testData, NativeImageLoader.ALLOWED_FORMATS, RandNumGen);
+		ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
+		ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, labelMaker);
 
-					trainData = new File(train_path);
-					testData = new File(test_path);
-					FileSplit train = new FileSplit(trainData, NativeImageLoader.ALLOWED_FORMATS, RandNumGen);
-					FileSplit test = new FileSplit(testData, NativeImageLoader.ALLOWED_FORMATS, RandNumGen);
-					ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
-					ImageRecordReader recordReader = new ImageRecordReader(height, width, channels, labelMaker);
+		try {
+			recordReader.initialize(train);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		recordReader.setListeners(new LogRecordListener());
+		DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+		DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
+		scaler.fit(dataIter);
+		dataIter.setPreProcessor(scaler);
 
-					try {
-						recordReader.initialize(train);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					recordReader.setListeners(new LogRecordListener());
-					DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
-					DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
-					scaler.fit(dataIter);
-					dataIter.setPreProcessor(scaler);
+		// ParentPathLabelGenerator labelMaker2 = new ParentPathLabelGenerator();
 
-					// ParentPathLabelGenerator labelMaker2 = new ParentPathLabelGenerator();
+		ImageRecordReader recordReader_Test = new ImageRecordReader(height, width, channels, labelMaker);
+		try {
+			recordReader_Test.initialize(test);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
-					ImageRecordReader recordReader_Test = new ImageRecordReader(height, width, channels, labelMaker);
-					try {
-						recordReader_Test.initialize(test);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+		// DataNormalization scaler2 = new ImagePreProcessingScaler(0, 1);
+		DataSetIterator dataIter_test = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
+		scaler.fit(dataIter_test);
+		dataIter_test.setPreProcessor(scaler);
 
-					// DataNormalization scaler2 = new ImagePreProcessingScaler(0, 1);
-					DataSetIterator dataIter_test = new RecordReaderDataSetIterator(recordReader, batchSize, 1,
-							outputnum);
-					scaler.fit(dataIter_test);
-					dataIter_test.setPreProcessor(scaler);
+		if (networkType == NetworkType.OWN) {
+			network = null;
 
-					if (networkType == NetworkType.OWN) {
-						network = null;
-						
-						network = own(amountoflayers);
-						//Nd4j.getMemoryManager().setAutoGcWindow(5000);
-						network.init();
-					}
+			network = own(amountoflayers);
+			// Nd4j.getMemoryManager().setAutoGcWindow(5000);
+			network.init();
+		}
 
+		if (networkType != NetworkType.GoogleNet) {
+
+			List<IterationListener> listeners = new ArrayList<>();
+
+			if (showinbrowser) {
+				uiServer = UIServer.getInstance();
+				statsStorage = new InMemoryStatsStorage();
+				int listenerFrequency = 1;
+				// network.setListeners(new StatsListener(statsStorage, listenerFrequency));
+				uiServer.attach(statsStorage);
+				listeners.add(new StatsListener(statsStorage, listenerFrequency));
+				listeners.add(new ScoreIterationListener(10));
+				network.setListeners(listeners);
+			} else {
+				network.setListeners(new ScoreIterationListener(10));
+			}
+
+		}
+		// MultiLayerNetwork
+		// MultiLayerNetwork network = lenetModel();
+		// network.init();
+
+		// EarlyStoppingModelSaver saver = new LocalFileModelSaver(path_model);
+
+		for (int w = 0; w < epochscounter; w++) {
+			while (dataIter.hasNext()) {
+				// dataIter.next();
+				// network.fit(dataIter);
+				try {
+					DataSet testSet = dataIter.next();
+
+					// system.out.println(testSet);
+					// System.out.println(testSet.getLabels());
+					testSet.shuffle();
+					// network.fit(testSet);
 					if (networkType != NetworkType.GoogleNet) {
-
-						List<IterationListener> listeners = new ArrayList<>();
-
-						if (showinbrowser) {
-							uiServer = UIServer.getInstance();
-							statsStorage = new InMemoryStatsStorage();
-							int listenerFrequency = 1;
-							// network.setListeners(new StatsListener(statsStorage, listenerFrequency));
-							uiServer.attach(statsStorage);
-							listeners.add(new StatsListener(statsStorage, listenerFrequency));
-							listeners.add(new ScoreIterationListener(10));
-							network.setListeners(listeners);
-						} else {
-							network.setListeners(new ScoreIterationListener(10));
-						}
-
-					}
-					// MultiLayerNetwork
-					// MultiLayerNetwork network = lenetModel();
-					// network.init();
-
-					// EarlyStoppingModelSaver saver = new LocalFileModelSaver(path_model);
-
-					for (int w = 0; w < epochscounter; w++) {
-						while (dataIter.hasNext()) {
-							// dataIter.next();
-							// network.fit(dataIter);
-							try {
-								DataSet testSet = dataIter.next();
-
-								// system.out.println(testSet);
-								// System.out.println(testSet.getLabels());
-								testSet.shuffle();
-								// network.fit(testSet);
-								if (networkType != NetworkType.GoogleNet) {
-									network.fit(testSet);
-								} else {
-									googlenet.fit(testSet);
-								}
-								testSet = null;
-								// System.out.println(testSet.getLabels().sum(0));
-
-							} catch (Exception e) {
-								LOGGER.info("FAILED to train Network! " + e.getMessage());
-							}
-
-					recordReader.reset();
-					try {
-						recordReader.initialize(test);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
-					scaler.fit(testIter);
-					testIter.setPreProcessor(scaler);
-					Evaluation eval = new Evaluation(2);
-
-					if (networkType != NetworkType.GoogleNet) {
-						eval = network.evaluate(testIter);
+						network.fit(testSet);
 					} else {
-						eval = googlenet.evaluate(testIter);
+						googlenet.fit(testSet);
 					}
-
-					LOGGER.info(eval.stats());
+					testSet = null;
+					// System.out.println(testSet.getLabels().sum(0));
 				
-					LOGGER.info(Double.toString(eval.accuracy()));
+				} catch (Exception e) {
+					LOGGER.info("FAILED to train Network! " + e.getMessage());
+				}
+			}
+				recordReader.reset();
+				try {
+					recordReader.initialize(test);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, outputnum);
+				scaler.fit(testIter);
+				testIter.setPreProcessor(scaler);
+				Evaluation eval = new Evaluation(2);
 
-					PrintWriter writer = null;
-					;
-					try {
-						int zaehler = 1;
-						File create = new File(output_path + "\\Textfiles");
-						create.mkdirs();
-						String txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
-						while (new File(txt_pfad).exists()) {
-							zaehler++;
-							txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
-						}
-						if (eval.accuracy() > accuracy) {
+				if (networkType != NetworkType.GoogleNet) {
+					eval = network.evaluate(testIter);
+				} else {
+					eval = googlenet.evaluate(testIter);
+				}
 
-							bestNetwork = txt_pfad;
+				LOGGER.info(eval.stats());
 
-							accuracy = eval.accuracy();
-							LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
-					
+				LOGGER.info(Double.toString(eval.accuracy()));
 
-						}
-						writer = new PrintWriter(txt_pfad, "UTF-8");
-						//writer.println("Anzahl CNN LAYER :" + i);
-						writer.println("BatchSize :" + batchSize);
-						writer.println("Accurancy:" + eval.accuracy());
-						writer.println("Confusion Matrix:" + eval.getConfusionMatrix());
-						writer.println("------");
-						writer.println("Updater: " + network.getUpdater().toString());
-						//writer.println("WeightInit:" + weightinit.toString());
-						NeuralNetConfiguration netconf = network.conf();
-						writer.println("LEARNING RATE POLICY:" + netconf.getLearningRatePolicy().toString());
-						writer.println("SEED:" + seed);
-						//writer.println("OptimizationAlgo:" + optialgo.toString());
+				PrintWriter writer = null;
+				;
+				try {
+					int zaehler = 1;
+					File create = new File(output_path + "\\Textfiles");
+					create.mkdirs();
+					String txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
+					while (new File(txt_pfad).exists()) {
+						zaehler++;
+						txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
+					}
+					if (eval.accuracy() > accuracy) {
+
+						bestNetwork = txt_pfad;
+
+						accuracy = eval.accuracy();
+						LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
+
+					}
+					writer = new PrintWriter(txt_pfad, "UTF-8");
+					// writer.println("Anzahl CNN LAYER :" + i);
+					writer.println("BatchSize :" + batchSize);
+					writer.println("Accurancy:" + eval.accuracy());
+					writer.println("Confusion Matrix:" + eval.getConfusionMatrix());
+					writer.println("------");
+					writer.println("Updater: " + network.getUpdater().toString());
+					// writer.println("WeightInit:" + weightinit.toString());
+					NeuralNetConfiguration netconf = network.conf();
+					writer.println("LEARNING RATE POLICY:" + netconf.getLearningRatePolicy().toString());
+					writer.println("SEED:" + seed);
+					// writer.println("OptimizationAlgo:" + optialgo.toString());
+					writer.close();
+					writer = null;
+
+				} catch (Exception e) {
+					if (writer != null) {
 						writer.close();
-						writer = null;
-
-					} catch (Exception e) {
-						if (writer != null) {
-							writer.close();
-						}
-
-						LOGGER.info(e.getMessage());
 					}
 
-					try {
-						// Model m = result.getBestModel();
+					LOGGER.info(e.getMessage());
+				}
 
-						int counter = 0;
-						String tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
-						while (new File(tmp_model_path).exists()) {
-							counter++;
-							tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
-						}
+				try {
+					// Model m = result.getBestModel();
 
-						if (networkType != NetworkType.GoogleNet) {
-							ModelSerializer.writeModel(network, new File(tmp_model_path), true);
-						} else {
-							ModelSerializer.writeModel(googlenet, new File(tmp_model_path), true);
-						}
-
-						/// LABELS ZU DER ZIP DATEI HINZUFÜGEN
-
-						addLabelsToZipFolder(labels, new File(tmp_model_path));
-
-						/////
-
-						/// HIER AUCH DAS GANZE NETZ ABSPEICHERN
-					} catch (Exception e) {
-						LOGGER.info("NOT SAVED : " + e.getMessage());
+					int counter = 0;
+					String tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
+					while (new File(tmp_model_path).exists()) {
+						counter++;
+						tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
 					}
 
-					// network = null;
+					if (networkType != NetworkType.GoogleNet) {
+						ModelSerializer.writeModel(network, new File(tmp_model_path), true);
+					} else {
+						ModelSerializer.writeModel(googlenet, new File(tmp_model_path), true);
+					}
 
-					try {
-						recordReader.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					try {
-						recordReader_Test.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					recordReader = null;
-					recordReader_Test = null;
-					eval = null;
-					dataIter = null;
-					dataIter_test = null;
-					scaler = null;
-					labelMaker = null;
-					//optialgo = null;
-					test = null;
-					train = null;
-					testData = null;
-					trainData = null;
-					network = null;
-					/// NUR WEITER OPTIMIEREN WENN OWN
-						}
+					/// LABELS ZU DER ZIP DATEI HINZUFÜGEN
+
+					addLabelsToZipFolder(labels, new File(tmp_model_path));
+
+					/////
+
+					/// HIER AUCH DAS GANZE NETZ ABSPEICHERN
+				} catch (Exception e) {
+					LOGGER.info("NOT SAVED : " + e.getMessage());
+				}
+
+				// network = null;
+
+				try {
+					recordReader.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					recordReader_Test.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				recordReader = null;
+				recordReader_Test = null;
+				eval = null;
+				dataIter = null;
+				dataIter_test = null;
+				scaler = null;
+				labelMaker = null;
+				// optialgo = null;
+				test = null;
+				train = null;
+				testData = null;
+				trainData = null;
+				network = null;
+				/// NUR WEITER OPTIMIEREN WENN OWN
+			
+		}
 	}
-					}
 
 	public int getCnn_min() {
 		return cnn_min;
