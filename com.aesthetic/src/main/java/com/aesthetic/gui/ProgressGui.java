@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 
 public class ProgressGui extends JDialog {
 	
@@ -56,6 +57,14 @@ public class ProgressGui extends JDialog {
 		 textArea = new JTextArea();
 		 textArea.setBounds(10, 47, 520, 446);
 		 getContentPane().add(textArea);
+		 
+		 JScrollPane scrollPane = new JScrollPane(textArea);
+		 scrollPane.setBounds(10, 47, 520, 446);
+		 getContentPane().add(scrollPane);
+		 
+		 
+		 
+		 
 		
 		
 		

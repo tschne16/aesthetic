@@ -783,8 +783,8 @@ public class ThreadNet implements Runnable {
 
 				bestNetwork = txt_pfad;
 
-				accuracy = eval.accuracy();
-				confusionmatrix = eval.getConfusionMatrix().toString();
+				ThreadNet.setAccuracy( eval.accuracy());
+				ThreadNet.setConfusionmatrix(eval.getConfusionMatrix().toString());
 				LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
 
 			}
