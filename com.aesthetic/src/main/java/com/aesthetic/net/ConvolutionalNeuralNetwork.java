@@ -1064,9 +1064,9 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 					dataIter_test.setPreProcessor(scaler);
 
 					if (networkType == NetworkType.OWN) {
+						network = null;
 						network = own(i, weightinit, optialgo);
-						Nd4j.getMemoryManager().setAutoGcWindow(5000);
-						// network = Kao();
+						//Nd4j.getMemoryManager().setAutoGcWindow(5000);
 						network.init();
 					}
 
@@ -1302,7 +1302,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 					train = null;
 					testData = null;
 					trainData = null;
-
+					network = null;
 					/// NUR WEITER OPTIMIEREN WENN OWN
 					if (networkType != NetworkType.OWN) {
 						return null;
