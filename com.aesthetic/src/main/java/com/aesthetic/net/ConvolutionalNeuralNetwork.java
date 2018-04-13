@@ -785,7 +785,7 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		//builder.inferenceWorkspaceMode(WorkspaceMode.SINGLE);
 		//builder.trainingWorkspaceMode(WorkspaceMode.SINGLE);
 		builder.iterations(1);
-		builder.learningRate(0.1);
+		builder.learningRate(0.01);
 		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
 		// builder.learningRateSchedule(lrSchedule);
 		// builder.updater(Updater.NESTEROVS);
@@ -837,7 +837,6 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			// cnncounter = cnncounter+4;
 			// counter = i+4;
 		}
-		// 4096
 		// cnncounter++;
 		listbuilder.layer(cnncounter, new LocalResponseNormalization.Builder().name("lrn2" + cnncounter).build());
 		cnncounter++;
@@ -846,8 +845,8 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		counter = cnncounter;
 		listbuilder.layer(counter,
 				fullyConnected("ffn" + counter, 500, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
-		listbuilder.layer(counter + 1,
-				fullyConnected("ffn" + counter + 1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+	//	listbuilder.layer(counter + 1,
+				//fullyConnected("ffn" + counter + 1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
 
 		listbuilder.layer(counter + 1,
 				new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).name("output").nOut(2)
