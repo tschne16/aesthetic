@@ -782,10 +782,10 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 		// {
 		// builder.dist(new NormalDistribution(0.0, 0.01));
 		// }
-		builder.inferenceWorkspaceMode(WorkspaceMode.SINGLE);
-		builder.trainingWorkspaceMode(WorkspaceMode.SINGLE);
+		//builder.inferenceWorkspaceMode(WorkspaceMode.SINGLE);
+		//builder.trainingWorkspaceMode(WorkspaceMode.SINGLE);
 		builder.iterations(1);
-		builder.learningRate(0.001);
+		builder.learningRate(0.1);
 		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
 		// builder.learningRateSchedule(lrSchedule);
 		// builder.updater(Updater.NESTEROVS);
