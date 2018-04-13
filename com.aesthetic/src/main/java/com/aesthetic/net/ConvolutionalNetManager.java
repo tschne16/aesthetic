@@ -26,16 +26,19 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	private int epochs;
 	private List<Double> accuracies;
 	private double bestaccuracy;
+	private String bestmodel;
+	private String bestmodel_path;
+	private int bestnumber;
 	@Override
 	protected Void doInBackground() throws Exception {
 		accuracies = new ArrayList<Double>();
 		for(int i = cnn_min; cnn_min<= cnn_max;i++)
 		{
 			ThreadNet convnet = new ThreadNet(train_path,test_path,model_path,nettype,showinb,i,batchsize,epochs);
-			publish("STARTING");
+			publish("STARTING! Using additional layers: " + i);
 			Thread t = new Thread(convnet);
 			t.start();
-			publish("Waiting for Results");
+			publish("Waiting for results....");
 			t.join();
 			accuracies.add(convnet.getAccuracy());
 			publish("ACCURACY " + Double.toString(convnet.getAccuracy()));
@@ -46,6 +49,8 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 				bestaccuracy = convnet.getAccuracy();
 				jlabel.setText(Double.toString(bestaccuracy));
 				additional.setText(Integer.toString(i));
+				bestmodel_path = convnet.getTmp_model_path();
+				bestnumber = i;
 			}
 			
 			convnet = null;
@@ -53,6 +58,12 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 			Thread.sleep(5000);
 		}
 		
+		publish("Best MODEL CAN BE FOUND HERE: " + bestmodel_path);
+		publish("Accuracy: " + bestaccuracy);
+		publish("Number of Layer: " + bestaccuracy);
+		publish("Best Number of additional Layer: " + bestnumber);
+		publish("# of Epochs: " + epochs);
+		publish("batchsize: " + batchsize);
 		
 		return null;
 	}

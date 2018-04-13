@@ -147,6 +147,14 @@ public class ThreadNet implements Runnable {
 	private static Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ThreadNet.class);
 	private static String bestNetwork;
 	private volatile double accuracy = 0;
+	private volatile String tmp_model_path;
+	public String getTmp_model_path() {
+		return tmp_model_path;
+	}
+
+	public void setTmp_model_path(String tmp_model_path) {
+		this.tmp_model_path = tmp_model_path;
+	}
 
 	public double getAccuracy() {
 		return accuracy;
@@ -823,7 +831,7 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 			// Model m = result.getBestModel();
 
 			int counter = 0;
-			String tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
+			 tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
 			while (new File(tmp_model_path).exists()) {
 				counter++;
 				tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
