@@ -634,7 +634,9 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			NativeImageLoader loader = new NativeImageLoader(height, width, 3);
 			INDArray image = null;
 			try {
+				
 				image = loader.asMatrix(file);
+				
 			} catch (Exception e) {
 				LOGGER.error("the loader.asMatrix occured an error", e);
 			}
@@ -642,11 +644,13 @@ public class ConvolutionalNeuralNetwork extends SwingWorker<Void, String> {
 			INDArray output = network.output(image);
 
 			
-
+			DataNormalization scaler = new ImagePreProcessingScaler(0,1);
+            scaler.transform(image);
+            
 			int[] predict = network.predict(image);
 			String modelResult = "";//"Prediction: ";
 
-			modelResult = modelResult + classes[predict[0]];
+			modelResult = modelResult + Integer.toString(predict[0]);
 
 			/*
 			 * for(int i = 0; i < predict.length;i++) { if(i < labels.size()) { modelResult
