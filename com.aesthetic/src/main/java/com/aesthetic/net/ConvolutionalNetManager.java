@@ -35,6 +35,9 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		for(int i = cnn_min; cnn_min<= cnn_max;i++)
 		{
 			ThreadNet convnet = new ThreadNet(train_path,test_path,model_path,nettype,showinb,i,batchsize,epochs);
+			
+			publish("CONFIGURATION : EPOCHS: " +  epochs + " Batchsize:" + batchsize);
+			
 			publish("STARTING! Using additional layers: " + i);
 			Thread t = new Thread(convnet);
 			t.start();
@@ -73,12 +76,12 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 
 
 
-	public ConvolutionalNetManager(JTextArea jDP, JLabel jlabel, int batchsize, int cnn_min, int cnn_max,
-			String train_path, String test_path, String model_path, NetworkType nettype, boolean showinb, int epochs,JLabel add) {
+	public ConvolutionalNetManager(JTextArea jDP, JLabel jlabel, int batch, int cnn_min, int cnn_max,
+			String train_path, String test_path, String model_path, NetworkType nettype, boolean showinb, int ep,JLabel add) {
 		super();
 		JDP = jDP;
 		this.jlabel = jlabel;
-		this.batchsize = batchsize;
+		this.batchsize = batch;
 		this.cnn_min = cnn_min;
 		this.cnn_max = cnn_max;
 		this.train_path = train_path;
@@ -86,7 +89,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		this.model_path = model_path;
 		this.nettype = nettype;
 		this.showinb = showinb;
-		this.epochs = epochs;
+		this.epochs = ep;
 		this.additional = add;
 	}
 
@@ -98,7 +101,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	@Override
 	protected void process(List<String> chunks) {
 
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(Calendar.getInstance().getTime());
 
 		for (String text : chunks) {
 
