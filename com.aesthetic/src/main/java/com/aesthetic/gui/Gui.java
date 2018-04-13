@@ -95,6 +95,7 @@ public class Gui extends JFrame{
 	private int batchsize = 15;
 	private int cnn_max = 5;
 	private int cnn_min = 1;
+	private GuiResult guiresult;
 	ParamGui param = null;
 	JCheckBox chckbxShowBrowser;
 	private JTextField txt2DefineInputPath;
@@ -654,7 +655,18 @@ public class Gui extends JFrame{
 				HashMap<String, String> ausgabe;
 				try {
 					ausgabe = ConvolutionalNeuralNetwork.Try_model(new File(model_path), files);
-					  Iterator it = ausgabe.entrySet().iterator();
+					 
+					
+					guiresult = new GuiResult(ausgabe);
+					
+					guiresult.setDefaultCloseOperation(guiresult.HIDE_ON_CLOSE);
+					guiresult.setSize(500,500);
+					guiresult.setLocation(140,140);
+					guiresult.setVisible(true);
+					
+					
+					
+					/*Iterator it = ausgabe.entrySet().iterator();
 					  String erg = "";
 					    while (it.hasNext()) {
 					        Map.Entry pair = (Map.Entry)it.next();
@@ -667,7 +679,7 @@ public class Gui extends JFrame{
 					
 		
 					
-					JOptionPane.showMessageDialog(null,erg);
+					JOptionPane.showMessageDialog(null,erg);*/
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null,"An Error occurred: " + e1.getMessage() );
