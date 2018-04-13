@@ -47,6 +47,7 @@ import com.aesthetic.main.CreateImage;
 import com.aesthetic.main.DBHelper;
 import com.aesthetic.main.FlickrCrawler;
 import com.aesthetic.net.AVAStructureGeneratior;
+import com.aesthetic.net.ConvolutionalNetManager;
 import com.aesthetic.net.ConvolutionalNeuralNetwork;
 import com.aesthetic.net.NetworkType;
 import com.aesthetic.net.StructureGenerator;
@@ -88,6 +89,7 @@ public class Gui extends JFrame{
 	private JRadioButton rdbtnOwn;
 	private ButtonGroup btG;
 	private ProgressGui pg;
+	private ConvolutionalNetManager convnetmanager;
 	private SQLGui sqlgui;
 	private int epochs = 30;
 	private int batchsize = 15;
@@ -462,12 +464,18 @@ public class Gui extends JFrame{
 					
 					
 					
-					conv_worker = new ConvolutionalNeuralNetwork(trainingsdata_path, testdata_path, output_path, pg, nettype,showinbrowser);
+					/*conv_worker = new ConvolutionalNeuralNetwork(trainingsdata_path, testdata_path, output_path, pg, nettype,showinbrowser);
 					conv_worker.setBatchSize(batchsize);
 					conv_worker.setCnn_min(cnn_min);
 					conv_worker.setCnn_max(cnn_max);
 					conv_worker.setEpochscounter(epochs);
-					conv_worker.execute();
+					conv_worker.execute();*/
+					
+					
+					convnetmanager = new ConvolutionalNetManager(pg.getTextArea(), pg.getLblWert(), batchsize, cnn_min, cnn_max, trainingsdata_path, testdata_path, output_path, nettype, showinbrowser, epochs);
+					convnetmanager.execute();
+					
+					
 					//ConvolutionalNeuralNetwork.newTry(trainingsdata_path, testdata_path,output_path,nettype);
 				} catch ( Exception e1) {
 					// TODO Auto-generated catch block
