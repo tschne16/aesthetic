@@ -146,14 +146,22 @@ public class ThreadNet implements Runnable {
 	private static int epochs = 50;
 	private static Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ThreadNet.class);
 	private static String bestNetwork;
-	private static double accuracy = 0;
+	private volatile double accuracy = 0;
+
+	public double getAccuracy() {
+		return accuracy;
+	}
+
+	public void setAccuracy(double accuracy) {
+		this.accuracy = accuracy;
+	}
 
 	private String train_path = "";
 	private String test_path = "";
 	private String output_path = "";
 	private NetworkType networkType;
 	private int amountoflayers;
-	private static String confusionmatrix;
+	private volatile String confusionmatrix;
 	private boolean showinbrowser = true;
 
 	public static void main(String[] args) {
@@ -783,8 +791,8 @@ public class ThreadNet implements Runnable {
 
 				bestNetwork = txt_pfad;
 
-				ThreadNet.setAccuracy( eval.accuracy());
-				ThreadNet.setConfusionmatrix(eval.getConfusionMatrix().toString());
+				this.setAccuracy( eval.accuracy());
+				this.setConfusionmatrix(eval.getConfusionMatrix().toString());
 				LOGGER.info("FOUND NEW BEST MODEL! ACCURACY: " + eval.accuracy());
 
 			}
@@ -893,20 +901,14 @@ public class ThreadNet implements Runnable {
 		this.epochscounter = epochscounter;
 	}
 
-	public static double getAccuracy() {
-		return accuracy;
-	}
-
-	public static void setAccuracy(double accuracy) {
-		ThreadNet.accuracy = accuracy;
-	}
-
-	public static String getConfusionmatrix() {
+	public String getConfusionmatrix() {
 		return confusionmatrix;
 	}
 
-	public static void setConfusionmatrix(String confusionmatrix) {
-		ThreadNet.confusionmatrix = confusionmatrix;
+	public void setConfusionmatrix(String confusionmatrix) {
+		this.confusionmatrix = confusionmatrix;
 	}
+
+	
 
 }

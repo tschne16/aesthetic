@@ -35,9 +35,9 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 			publish("Waiting for Results");
 			t.join();
 			publish("Got it");
-			accuracies.add(ThreadNet.getAccuracy());
-			publish("ACCURACY " + Double.toString(ThreadNet.getAccuracy()));
-			publish(ThreadNet.getConfusionmatrix());
+			accuracies.add(convnet.getAccuracy());
+			publish("ACCURACY " + Double.toString(convnet.getAccuracy()));
+			publish(convnet.getConfusionmatrix());
 			convnet = null;
 			publish("RESTING A BIT....");
 			Thread.sleep(5000);
