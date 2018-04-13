@@ -38,9 +38,9 @@ public int counter = 0;
 		  String erg = "";		    
 
 		        Map.Entry pair = (Map.Entry)it.next(); 
-		        lblName.setText("File");
+		        lblName.setText(pair.getKey().toString());
 		        BufferedImage myPicture = ImageIO.read(new File(pair.getKey().toString()));
-		        
+		        lblKlasse.setText(pair.getValue().toString());
 		        if(myPicture != null )
 		        {
 		    		JLabel lblPicture = new JLabel(new ImageIcon(myPicture));
@@ -48,6 +48,7 @@ public int counter = 0;
 		    		getContentPane().add(lblPicture);
 		        }
 
+		        
 		      //  erg = erg + (pair.getKey() + " " + pair.getValue() + "\n");
 		        //it.remove(); // avoids a ConcurrentModificationException
 		    
