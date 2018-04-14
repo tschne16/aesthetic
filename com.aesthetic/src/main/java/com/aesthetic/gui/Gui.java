@@ -71,7 +71,7 @@ public class Gui extends JFrame{
 	public JLabel lblNewLabel_img_abort;
 	private JTextField txtDefinePath;
 	private JFileChooser chooser;
-	private String path;
+	private String outpath_2 = "";
 	private File[] files;
 	private String trainingsdata_path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\train data";
 	private String testdata_path = "C:\\Users\\Torben\\Desktop\\New Small Dataset\\test data";
@@ -268,9 +268,9 @@ public class Gui extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				struc_worker = new StructureGenerator();
 				
-				if(path != "")
+				if(outpath_2 != "")
 				{
-					struc_worker.setPath(path);
+					struc_worker.setPath(outpath_2);
 					
 					try{
 						struc_worker.execute();
@@ -306,11 +306,11 @@ public class Gui extends JFrame{
 				    //    
 				    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) { 
 				      
-				    	path = chooser.getSelectedFile().getPath();
-				    	txtDefinePath.setText(path);
+				    	outpath_2 = chooser.getSelectedFile().getPath();
+				    	txtDefinePath.setText(outpath_2);
 				      }
 				    else {
-				      path = "";
+				    	outpath_2 = "";
 				      }		
 			}
 		});
@@ -321,7 +321,7 @@ public class Gui extends JFrame{
 			
 				try {
 					try {
-					AVAStructureGeneratior.OrganizeAva(path);
+					AVAStructureGeneratior.OrganizeAva(inputpath2,outpath_2);
 } catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -367,9 +367,9 @@ public class Gui extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				
 				
-				if(new File(path).exists() && new File(inputpath2).exists())
+				if(new File(outpath_2).exists() && new File(inputpath2).exists())
 				{
-				CreateImage.cropImages(inputpath2,path, 100, 100);
+				CreateImage.cropImages(inputpath2,outpath_2, 224, 224);
 				JOptionPane.showMessageDialog(null, "Done!");
 				}
 				else

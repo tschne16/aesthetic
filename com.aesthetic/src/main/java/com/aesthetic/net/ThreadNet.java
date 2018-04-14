@@ -738,18 +738,25 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 		// EarlyStoppingModelSaver saver = new LocalFileModelSaver(path_model);
 
 		for (int w = 0; w < epochscounter; w++) {
+			int counter = dataIter.getLabels().size();
+			
+			LOGGER.info("DATAITER hat Einträge: " + counter);
+			
 			while (dataIter.hasNext()) {
 				// dataIter.next();
 				// network.fit(dataIter);
+				
 				try {
 					DataSet testSet = dataIter.next();
-
+					LOGGER.info("TESTSET HAT EINTRÄGE: " + testSet.getLabelNamesList().size());
 					// system.out.println(testSet);
 					// System.out.println(testSet.getLabels());
 					testSet.shuffle();
 					// network.fit(testSet);
 					if (networkType != NetworkType.GoogleNet) {
 						network.fit(testSet);
+						
+						
 					} else {
 						googlenet.fit(testSet);
 					}
