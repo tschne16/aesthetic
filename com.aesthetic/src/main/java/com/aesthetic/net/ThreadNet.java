@@ -748,7 +748,7 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 				
 				try {
 					DataSet testSet = dataIter.next();
-					LOGGER.info("TESTSET HAT EINTRÄGE: " + testSet.getLabelNamesList().size());
+					LOGGER.info("TESTSET HAT EINTRÄGE: " + testSet.getLabels().sum(0));
 					// system.out.println(testSet);
 					// System.out.println(testSet.getLabels());
 					testSet.shuffle();
