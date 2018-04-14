@@ -133,7 +133,7 @@ public class ThreadNet implements Runnable {
 		ThreadNet.batchSize = batchSize;
 	}
 
-	private int epochscounter = 30;
+	private int epochscounter = 75;
 	private int cnn_min = 1;
 	private int cnn_max = 5;
 	// private static final long seed = 12345;
