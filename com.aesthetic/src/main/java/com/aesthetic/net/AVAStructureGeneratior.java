@@ -138,7 +138,7 @@ public class AVAStructureGeneratior {
 			}
 				
 			
-			String[] bla = line.split(" ");
+			String[] bla = line.split(";");
 			
 			av = new AVAHelper();
 			av.setId(Long.parseLong(bla[0]));
