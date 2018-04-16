@@ -24,6 +24,8 @@ import com.google.common.io.Files;
 public class AVAStructureGeneratior {
 
 	public static void OrganizeAva(String inputpath, String outputpath) throws Exception {
+		try
+		{
 		StringBuilder sb = new StringBuilder();
 		BufferedReader br = null;
 
@@ -83,7 +85,11 @@ public class AVAStructureGeneratior {
 
 			}
 		}
-
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		//FolderSystemTwoSplit(inputpath, outputpath);
 		copy(inputpath,outputpath);
 	}
