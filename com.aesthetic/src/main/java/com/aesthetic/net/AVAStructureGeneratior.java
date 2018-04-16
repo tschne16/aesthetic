@@ -105,7 +105,7 @@ public class AVAStructureGeneratior {
 		//LOAD FROM FILESYSTEM
 		
 		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-		InputStream is = classloader.getResourceAsStream("AVA_SET.csv");
+		InputStream is = classloader.getResourceAsStream("AVA.txt");
 		InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
 		BufferedReader reader = new BufferedReader(streamReader);
 		List<AVAHelper> all = new ArrayList<AVAHelper>();
@@ -123,7 +123,7 @@ public class AVAStructureGeneratior {
 			}
 		
 		
-		is = classloader.getResourceAsStream("AVA_SET.csv");
+		is = classloader.getResourceAsStream("AVA.txt");
 		streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
 		reader = new BufferedReader(streamReader);
 		double counter = zaehler*0.8;
@@ -138,7 +138,7 @@ public class AVAStructureGeneratior {
 			}
 				
 			
-			String[] bla = line.split(";");
+			String[] bla = line.split(" ");
 			
 			av = new AVAHelper();
 			av.setId(Long.parseLong(bla[0]));
