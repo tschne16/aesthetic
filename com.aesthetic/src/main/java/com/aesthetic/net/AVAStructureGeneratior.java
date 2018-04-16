@@ -126,7 +126,7 @@ public class AVAStructureGeneratior {
 		is = classloader.getResourceAsStream("AVA.txt");
 		streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
 		reader = new BufferedReader(streamReader);
-		double counter = zaehler*0.8;
+		double counter = zaehler*0.9;
 		
 		String set = "TRAIN DATA";
 		for (String line; (line = reader.readLine()) != null;) {
