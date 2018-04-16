@@ -5,7 +5,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,12 +102,38 @@ public class AVAStructureGeneratior {
 	
 	public static void copy(String inputpath, String outputpath) throws Exception
 	{
-		List<AVAHelper> all = DBHelper.Load_AVA();
+		//LOAD FROM FILESYSTEM
+		
+		ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+		InputStream is = classloader.getResourceAsStream("AVA_SET.csv");
+		InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+		BufferedReader reader = new BufferedReader(streamReader);
+		List<AVAHelper> all = new ArrayList<AVAHelper>();
+		AVAHelper av = null;
+		
+		int count = 0;
+		for (String line; (line = reader.readLine()) != null;) {
+			
+			if (count == 0)
+				continue;
+			
+			String[] bla = line.split(";");
+			
+			av = new AVAHelper();
+			av.setId(Long.parseLong(bla[0]));
+			av.setRating(Double.parseDouble(bla[1]));
+			
+			all.add(av);
+			count++;
+		}
+		
+		
+		//List<AVAHelper> all = DBHelper.Load_AVA();
 		double counter = all.size()*0.8;
 		String set = "TRAIN DATA";
 		for(int i = 0; i < all.size();i++)
 		{
-			AVAHelper av = all.get(i);
+			 av = all.get(i);
 			
 			String foldername = "HIGH";	
 			if(av.getRating() <= 5)
