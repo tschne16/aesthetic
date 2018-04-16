@@ -122,6 +122,9 @@ public class AVAStructureGeneratior {
 				zaehler = zaehler +1;
 			}
 		
+		
+		is = classloader.getResourceAsStream("AVA_SET.csv");
+		streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
 		reader = new BufferedReader(streamReader);
 		double counter = zaehler*0.8;
 		
