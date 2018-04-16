@@ -84,9 +84,57 @@ public class AVAStructureGeneratior {
 			}
 		}
 
-		FolderSystemTwoSplit(inputpath, outputpath);
+		//FolderSystemTwoSplit(inputpath, outputpath);
+		copy(inputpath,outputpath);
 	}
 
+	
+	
+	public static void copy(String inputpath, String outputpath) throws Exception
+	{
+		List<AVAHelper> all = DBHelper.Load_AVA();
+		double counter = all.size()*0.8;
+		String set = "TRAIN DATA";
+		for(int i = 0; i < all.size();i++)
+		{
+			AVAHelper av = all.get(i);
+			
+			String foldername = "HIGH";	
+			if(av.getRating() <= 5)
+				foldername = "LOW";
+			else
+			{
+				if(av.getRating() < 5.8)
+				{
+					continue;
+				}
+			}
+			
+			if(counter <= i)
+			{
+				set = "TEST DATA";
+			}
+			
+			String ip = inputpath + System.getProperty("file.separator") + av.getId() + ".jpg";
+			
+			File f = new File(ip);
+			
+			if(f.exists())
+			{
+			String out = outputpath + System.getProperty("file.separator") + set +System.getProperty("file.separator") + foldername;
+			File output = new File(out);	
+			output.mkdirs();
+			
+			output = new File(out +System.getProperty("file.separator") + av.getId() + ".jpg");
+			Files.copy(f, output);
+			
+			}
+			
+		}
+		
+	}
+	
+	
 	public static void FolderSystemTwoSplit(String path, String output) throws Exception {
 		int beautifuL_counter=0;
 		int not_beautiful_counter=0;

@@ -158,7 +158,7 @@ public class CreateImage {
                     
                     if(img.getWidth()> width && img.getHeight()> height)
                     {
-	                    BufferedImage result = Scalr.crop(img,      	    (img.getWidth() - width) / 2, (img.getHeight() - height) / 2,
+	                    BufferedImage result = Scalr.crop(img,(img.getWidth() - width) / 2, (img.getHeight() - height) / 2,
 	                    	    width, height);
 	                    String name = f.getName();
 	                    
