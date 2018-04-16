@@ -755,8 +755,7 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 					// network.fit(testSet);
 					if (networkType != NetworkType.GoogleNet) {
 						network.fit(testSet);
-						
-						
+
 					} else {
 						googlenet.fit(testSet);
 					}

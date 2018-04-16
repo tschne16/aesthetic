@@ -147,33 +147,36 @@ public class CreateImage {
 			cropImages(orgpath, tarpath, height, width);
 			}
 		}
-		else
-		{
+		//*else
+		//{
 			for (final File f : origin.listFiles(IMAGE_FILTER)) {
                 BufferedImage img = null;
                 
                 try {
  
                     img = ImageIO.read(f);
-                    BufferedImage result = Scalr.crop(img,      	    (img.getWidth() - width) / 2, (img.getHeight() - height) / 2,
-                    	    width, height);
-                    String name = f.getName();
                     
-                    File outputfile = new File(targetpath + "\\" + name);
-                    ImageIO.write(result, FilenameUtils.getExtension(f.getName()), outputfile);
-                    
-                    img.flush();
-                    img = null;
-                    result.flush();
-                    result  = null;
-                    
+                    if(img.getWidth()> width && img.getHeight()> height)
+                    {
+	                    BufferedImage result = Scalr.crop(img,      	    (img.getWidth() - width) / 2, (img.getHeight() - height) / 2,
+	                    	    width, height);
+	                    String name = f.getName();
+	                    
+	                    File outputfile = new File(targetpath + "\\" + name);
+	                    ImageIO.write(result, FilenameUtils.getExtension(f.getName()), outputfile);
+	                    
+	                    img.flush();
+	                    img = null;
+	                    result.flush();
+	                    result  = null;
+                    }
                     
                 }
                 catch(Exception e)
                 {
                 	System.out.println(e.getMessage());
                 }
-		}
+		//}
 		
 		
 		
