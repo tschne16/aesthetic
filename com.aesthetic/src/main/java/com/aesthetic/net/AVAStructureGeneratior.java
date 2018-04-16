@@ -112,6 +112,20 @@ public class AVAStructureGeneratior {
 		AVAHelper av = null;
 		
 		int count = 0;
+		
+		int zaehler = 0;
+		
+		for(String line; (line = reader.readLine()) != null;) 
+			{
+				
+				
+				zaehler = zaehler +1;
+			}
+		
+		reader = new BufferedReader(streamReader);
+		double counter = zaehler*0.8;
+		
+		String set = "TRAIN DATA";
 		for (String line; (line = reader.readLine()) != null;) {
 			
 			if (count == 0)
@@ -129,11 +143,46 @@ public class AVAStructureGeneratior {
 			
 			all.add(av);
 			count++;
+			
+			
+			String foldername = "HIGH";	
+			if(av.getRating() <= 5)
+				foldername = "LOW";
+			else
+			{
+				if(av.getRating() < 5.8)
+				{
+					continue;
+				}
+			}
+			
+			if(counter <= count)
+			{
+				set = "TEST DATA";
+			}
+			
+			String ip = inputpath + System.getProperty("file.separator") + av.getId() + ".jpg";
+			
+			File f = new File(ip);
+			
+			if(f.exists())
+			{
+			String out = outputpath + System.getProperty("file.separator") + set +System.getProperty("file.separator") + foldername;
+			File output = new File(out);	
+			output.mkdirs();
+			
+			output = new File(out +System.getProperty("file.separator") + av.getId() + ".jpg");
+			Files.copy(f, output);
+			
+			}
+			
+			
+			
 		}
 		
 		
 		//List<AVAHelper> all = DBHelper.Load_AVA();
-		double counter = all.size()*0.8;
+	/*	double counter = all.size()*0.8;
 		String set = "TRAIN DATA";
 		for(int i = 0; i < all.size();i++)
 		{
@@ -170,7 +219,7 @@ public class AVAStructureGeneratior {
 			
 			}
 			
-		}
+		}*/
 		
 	}
 	
