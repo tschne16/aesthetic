@@ -115,7 +115,11 @@ public class AVAStructureGeneratior {
 		for (String line; (line = reader.readLine()) != null;) {
 			
 			if (count == 0)
+			{
+				count++;
 				continue;
+			}
+				
 			
 			String[] bla = line.split(";");
 			
