@@ -321,7 +321,7 @@ public class Gui extends JFrame{
 			
 				try {
 					try {
-					AVAStructureGeneratior.OrganizeAva(inputpath2,outpath_2);
+					AVAStructureGeneratior.copy(inputpath2,outpath_2);
 } catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
