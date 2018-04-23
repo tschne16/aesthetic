@@ -532,7 +532,7 @@ public class ThreadNet implements Runnable {
 		 * .l2(5 * 1e-4) .list();
 		 */
 		listbuilder.layer(0,
-				convInit("cnn1", channels, 64, new int[] { 7, 7 }, new int[] { 2, 2 }, new int[] { 0, 0 }, 0));
+				convInit("cnn1", channels, 64, new int[] { 11, 11 }, new int[] { 1, 1 }, new int[] { 0, 0 }, 0));
 		// listbuilder.layer(1, new
 		// LocalResponseNormalization.Builder().name("lrn1").build());
 		//listbuilder.layer(1, maxPool("maxpool1", new int[] { 2, 2 }));
@@ -834,8 +834,8 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 		if (networkType == NetworkType.OWN) {
 			network = null;
 			LOGGER.info("BUILD MODEL with Layers: " + amountoflayers );
-			//network = own(amountoflayers);
-			network = newown(amountoflayers,maxp,amountoffcc);
+			network = own(amountoflayers);
+			//network = newown(amountoflayers,maxp,amountoffcc);
 			// Nd4j.getMemoryManager().setAutoGcWindow(5000);
 			network.init();
 		}
