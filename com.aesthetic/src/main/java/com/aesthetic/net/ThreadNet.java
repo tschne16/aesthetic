@@ -169,6 +169,8 @@ public class ThreadNet implements Runnable {
 	private String output_path = "";
 	private NetworkType networkType;
 	private int amountoflayers;
+	private int amountoffcc;
+	private boolean maxp;
 	private volatile String confusionmatrix;
 	private boolean showinbrowser = true;
 
@@ -178,7 +180,7 @@ public class ThreadNet implements Runnable {
 	}
 
 	public ThreadNet(String train, String test, String out, NetworkType nettype, boolean showinb, int amount, int batch,
-			int epoch) {
+			int epoch, int fc, boolean max) {
 		// JDP = proggui.getTextArea();
 		// jlabel = proggui.getLblWert();
 		train_path = train;
@@ -189,6 +191,9 @@ public class ThreadNet implements Runnable {
 		amountoflayers = amount;
 		batchSize = batch;
 		epochscounter = epoch;
+		maxp = max;
+		amountoffcc = fc;
+		
 	}
 
 	public static MultiLayerNetwork Kao() {
@@ -825,7 +830,8 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 		if (networkType == NetworkType.OWN) {
 			network = null;
 			LOGGER.info("BUILD MODEL with Layers: " + amountoflayers );
-			network = own(amountoflayers);
+			//network = own(amountoflayers);
+			network = newown(amountoflayers,maxp,amountoffcc);
 			// Nd4j.getMemoryManager().setAutoGcWindow(5000);
 			network.init();
 		}

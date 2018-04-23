@@ -17,6 +17,8 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	private int batchsize = 15;
 	private int cnn_min = 1;
 	private int cnn_max = 6;
+	private int fcc = 1;
+	private boolean maxp;
 	private String train_path;
 	private String test_path;
 	private String model_path;
@@ -29,55 +31,60 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	private String bestmodel;
 	private String bestmodel_path;
 	private int bestnumber;
+
 	@Override
 	protected Void doInBackground() throws Exception {
 		accuracies = new ArrayList<Double>();
-		for(int i = cnn_min; i<= cnn_max;i++)
-		{
-			ThreadNet convnet = new ThreadNet(train_path,test_path,model_path,nettype,showinb,i,batchsize,epochs);
-			
-			publish("CONFIGURATION : EPOCHS: " +  epochs + " Batchsize:" + batchsize);
-			
-			publish("STARTING! Using additional layers: " + i);
-			Thread t = new Thread(convnet);
-			t.start();
-			publish("Waiting for results....");
-			t.join();
-			accuracies.add(convnet.getAccuracy());
-			publish("ACCURACY " + Double.toString(convnet.getAccuracy()));
-			publish(convnet.getConfusionmatrix());
-			
-			if(bestaccuracy < convnet.getAccuracy())
-			{
-				bestaccuracy = convnet.getAccuracy();
-				jlabel.setText(Double.toString(bestaccuracy));
-				additional.setText(Integer.toString(i));
-				bestmodel_path = convnet.getTmp_model_path();
-				bestnumber = i;
+		for (int i = cnn_min; i <= cnn_max; i++) {
+			for (int x = 0; x <= fcc; x++) {
+				
+				for(int y = 0;y <=1;y++)
+				{
+				Boolean maxpol = y == 1;
+				
+				ThreadNet convnet = new ThreadNet(train_path, test_path, model_path, nettype, showinb, i, batchsize,
+						epochs,fcc,maxpol);
+
+				publish("CONFIGURATION : EPOCHS: " + epochs + " Batchsize:" + batchsize);
+
+				publish("STARTING! Using additional layers: " + i);
+				publish("USING 1 MORE FULLY CONNECTED LAYER:" + (x==1));
+				publish("USING 1 MAXPOOL LAYER:" + maxpol);
+				Thread t = new Thread(convnet);
+				t.start();
+				publish("Waiting for results....");
+				t.join();
+				accuracies.add(convnet.getAccuracy());
+				publish("ACCURACY " + Double.toString(convnet.getAccuracy()));
+				publish(convnet.getConfusionmatrix());
+				
+				if (bestaccuracy < convnet.getAccuracy()) {
+					bestaccuracy = convnet.getAccuracy();
+					jlabel.setText(Double.toString(bestaccuracy));
+					additional.setText(Integer.toString(i));
+					bestmodel_path = convnet.getTmp_model_path();
+					bestnumber = i;
+				}
+
+				convnet = null;
+				publish("RESTING A BIT....");
+				Thread.sleep(5000);
+				}
 			}
-			
-			convnet = null;
-			publish("RESTING A BIT....");
-			Thread.sleep(5000);
 		}
-		
+
 		publish("Best MODEL CAN BE FOUND HERE: " + bestmodel_path);
 		publish("Accuracy: " + bestaccuracy);
 		publish("Number of Layer: " + bestaccuracy);
 		publish("Best Number of additional Layer: " + bestnumber);
 		publish("# of Epochs: " + epochs);
 		publish("batchsize: " + batchsize);
-		
+
 		return null;
 	}
 
-
-
-
-
-
-	public ConvolutionalNetManager(JTextArea jDP, JLabel jlabel, int batch, int cnn_min, int cnn_max,
-			String train_path, String test_path, String model_path, NetworkType nettype, boolean showinb, int ep,JLabel add) {
+	public ConvolutionalNetManager(JTextArea jDP, JLabel jlabel, int batch, int cnn_min, int cnn_max, String train_path,
+			String test_path, String model_path, NetworkType nettype, boolean showinb, int ep, JLabel add) {
 		super();
 		JDP = jDP;
 		this.jlabel = jlabel;
@@ -93,11 +100,6 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		this.additional = add;
 	}
 
-
-
-
-
-
 	@Override
 	protected void process(List<String> chunks) {
 
@@ -108,13 +110,13 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 			try {
 				JDP.append(timeStamp + ": " + text);
 				JDP.append(newline);
-				//jlabel.setText(Double.toString(accuracy));
+				// jlabel.setText(Double.toString(accuracy));
 			} catch (Exception e) {
 
 				e.printStackTrace();
 			}
 
 		}
-}
-	
+	}
+
 }
