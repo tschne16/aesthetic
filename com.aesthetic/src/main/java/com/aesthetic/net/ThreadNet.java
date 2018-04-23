@@ -486,7 +486,7 @@ public class ThreadNet implements Runnable {
 		// builder.setConvolutionMode(ConvolutionMode.Same);
 		// builder.setMiniBatch(miniBatch);
 		// builder.setUseRegularization(true);
-		builder.regularization(false).l2(0.0005);
+		builder.regularization(true).l2(0.0005);
 		// builder.convolutionMode(ConvolutionMode.Same);
 		// if(weight == WeightInit.DISTRIBUTION)
 		// {
@@ -509,6 +509,8 @@ public class ThreadNet implements Runnable {
 		// if(algo != null)
 		// builder.optimizationAlgo(algo);
 		//
+		builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
+		//builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		ListBuilder listbuilder = builder.list();
 
 		/*
@@ -521,7 +523,7 @@ public class ThreadNet implements Runnable {
 		 * .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) //
 		 * normalize to prevent vanishing or exploding gradients
 		 * //.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
-		 * //.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+		 //.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
 		 * //.learningRate(0.01) .learningRateDecayPolicy(LearningRatePolicy.Schedule)
 		 * .learningRateSchedule(lrSchedule) // .biasLearningRate(1e-2*2) //
 		 * .learningRateDecayPolicy(LearningRatePolicy.Step)
