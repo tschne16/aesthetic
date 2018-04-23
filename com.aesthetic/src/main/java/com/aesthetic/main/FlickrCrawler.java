@@ -131,8 +131,7 @@ public class FlickrCrawler extends SwingWorker<Void, Integer>{
             
            // byte[] bytesEncoded = Base64.encodeBase64(bytes);
             imageString = new String(Base64.encodeBase64(bytes), "UTF-8");
-
-            bos.close();
+         bos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -155,16 +154,52 @@ public class FlickrCrawler extends SwingWorker<Void, Integer>{
 
             if (nfo.getOriginalSecret().isEmpty()) {
                 //ImageIO.write(p.getLargeImage(), p.getOriginalFormat(), largeFile);
-            	BufferedImage thumbnail = Scalr.resize(p.getLargeImage(),Scalr.Mode.FIT_EXACT, 30,30);
+            	//BufferedImage thumbnail = Scalr.resize(p.getLargeImage(),Scalr.Mode.FIT_EXACT, 30,30);
+            	BufferedImage thumb = p.getLargeImage();
+            	
+            	
+            	if(thumb == null)
+            	{
+            	
+            		thumb = pi.getImage(p, Size.LARGE);
+            		
+            		if(thumb == null)
+            			return null;
+            	}
+            	
+            	
+            	BufferedImage thumbnail = Scalr.crop(thumb,(thumb.getWidth()-224)/2,(thumb.getHeight()-224)/2,224,224);
+            	
             	erg = encodeToString(thumbnail, p.getOriginalFormat(), p);
             	System.out.println(p.getTitle() + "\t" + erg);
             } else {
+            	
                 p.setOriginalSecret(nfo.getOriginalSecret());
                 //ImageIO.write(p.getOriginalImage(), p.getOriginalFormat(), orgFile);
-                BufferedImage pic = pi.getImage(p, Size.SMALL);
+                //BufferedImage pic = pi.getImage(p, Size.SMALL);
+                Size x = p.getLargeSize();
+                
+                
+                BufferedImage pic = null;
+                if(x.getWidth() > 1000 && x.getHeight() > 1000)
+                {
+                	 pic = pi.getImage(p,Size.LARGE_1600);
+                	    	
+                }
+                else
+                {
+                	pic = pi.getImage(p,Size.LARGE);
+                }
+                
+                if(pic == null)
+                	return null;
+                
+                
+                
+                BufferedImage thumbnail = Scalr.crop(pic, (pic.getWidth()-224)/2,(pic.getHeight()-224)/2,224,224);
                 
               //  BufferedImage thumbnail = Scalr.resize(pi.getImage(p.getUrl()), 60);
-                BufferedImage thumbnail = Scalr.resize(pic, Scalr.Mode.FIT_EXACT, 30,30);
+                //BufferedImage thumbnail = Scalr.resize(pic, Scalr.Mode.FIT_EXACT, 30,30);
                 
                // BufferedImage thumbnail = Scalr.resize(p.getOriginalImage(), 60);
                 erg =   encodeToString(thumbnail, p.getOriginalFormat(), p);
@@ -680,6 +715,7 @@ public class FlickrCrawler extends SwingWorker<Void, Integer>{
                 	}
                 	else
                 	{
+                	
                 		counter++;	 		
                 	}
                 	
@@ -711,7 +747,7 @@ public class FlickrCrawler extends SwingWorker<Void, Integer>{
                 int count = 0;
                 List<Future<?>> get = new ArrayList<Future<?>>();
                // ExecutorService es = Executors.newFixedThreadPool(amountthreads);
-                ExecutorService es = Executors.newFixedThreadPool(2);
+                ExecutorService es = Executors.newFixedThreadPool(amountthreads);
                 for(final Photo p : allphotos) {
                 	count = count+1;
                 	

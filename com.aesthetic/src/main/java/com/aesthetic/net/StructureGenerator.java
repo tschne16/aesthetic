@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import org.imgscalr.Scalr;
@@ -33,7 +35,7 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 	private static String path;
 	private static final Logger LOGGER = Logger.getLogger( DBHelper.class.getName() );
 	private static double count_all = 0;
-	private static double counter = 0;
+	private static volatile double counter = 0;
 	
 	
 	
@@ -49,7 +51,10 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 		List<Info> allpics = DBHelper.LoadAllPictures(100,null);
 
 		List<Info> eager = new ArrayList<Info>();
+		count_all = allpics.size();
 		
+
+		LOGGER.info("ANZAHL: " +allpics.size());
 		for(int i = 0; i < allpics.size();i++)
 		{
 			eager.add(allpics.get(i));
@@ -78,18 +83,39 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 		
 	}
 	
-	public static void process(Map<Long, String> dic,List<Info> ids) throws IOException
+
+	
+	public static void process(Map<Long, String> dic,List<Info> ids) throws Exception
 	{
 		String base64 ="";
 		double favsperview = 0;
+		double threshold = 0.03;
+		dic.size();
+		
+  
+		
 		
 		for(Info inf : ids)
 		{
+
 			counter++;
 			
 			LOGGER.log(Level.INFO,Boolean.toString(dic.containsKey(inf.getPhotoid())));
 		
 			base64 = dic.get(inf.getPhotoid());
+			
+			if(base64 == null)
+			{
+				base64 = DBHelper.GetSingleBase64(inf.getPhotoid());
+				
+				if(base64 == null || base64.equals(DBHelper.getInvalid_base()))
+				{
+				continue;
+				}
+			}
+				
+			
+			
 			double res = (double) inf.getFavs()/ (double) inf.getViews();
 			
 			String parentfolder;
@@ -104,7 +130,7 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 			
 			String folder;
 			
-			if(res >0.0223)
+			if(res >= threshold)
 			{
 				folder = "aesthetic";
 			}
@@ -147,6 +173,8 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 					}
 					
 				}
+				
+				
 				
 				Decode64AndWriteToFile(base64, tmp_path, inf.getPhotoid(),filetype);
 			}
@@ -247,16 +275,20 @@ List<Info> eager = new ArrayList<Info>();
 
 		
 		
-		
+		int width = 224;
+		int height = 224;
 		byte[] data = Base64.decodeBase64(b64);
 		
 		BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
 		
 		
-		if(image == null)
+		if(image == null|| image.getWidth() < width||image.getHeight()< height)
 			return;
 		
-		image = Scalr.resize(image,Scalr.Mode.FIT_EXACT, 30,30);
+		//image = Scalr.resize(image,Scalr.Mode.FIT_EXACT, 30,30);
+		
+		if(image.getWidth()> width && image.getHeight() > height)
+		image = Scalr.crop(image, (image.getWidth() - width) / 2, (image.getHeight() - height) / 2,width,height);
 		
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -267,12 +299,18 @@ List<Info> eager = new ArrayList<Info>();
 		
 		LOGGER.log(Level.INFO, tmp_path + System.getProperty("file.separator")+ id+ "." + filetype);
 		try (OutputStream stream = new FileOutputStream(tmp_path + System.getProperty("file.separator")+ id + ".jpg")) {
-		    stream.write(imageInByte);		
+		    stream.write(imageInByte);	
+		    
+		    
+		    stream.close();
+		    imageInByte = null;
 		}
 		catch(Exception e)
 		{
 			LOGGER.log(Level.INFO, e.getMessage());
 		}
+		
+		
 	}
 	
 	

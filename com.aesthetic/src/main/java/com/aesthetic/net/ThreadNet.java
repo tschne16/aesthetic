@@ -461,6 +461,123 @@ public class ThreadNet implements Runnable {
 
 	}
 
+	
+	private static MultiLayerNetwork newown(int amount_conv_layer, boolean maxpool, int amount_fcc)
+	{
+		double nonZeroBias = 0;// 1;
+		double dropOut = 0.5;
+
+		// ZU probierende Learningrates
+		/*
+		 * Map<Integer, Double> lrSchedule = new HashMap<>(); lrSchedule.put(1, 0.05);
+		 * lrSchedule.put(200, 0.01); lrSchedule.put(300, 0.001); lrSchedule.put(500,
+		 * 0.0001); lrSchedule.put(600, 0.00001);
+		 */
+		NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
+		builder.seed(seed);
+		// builder.weightInit(weight);
+		builder.weightInit(WeightInit.RELU);
+		builder.activation(Activation.RELU);
+		// builder.setConvolutionMode(ConvolutionMode.Same);
+		// builder.setMiniBatch(miniBatch);
+		// builder.setUseRegularization(true);
+		builder.regularization(false).l2(0.0005);
+		// builder.convolutionMode(ConvolutionMode.Same);
+		// if(weight == WeightInit.DISTRIBUTION)
+		// {
+		// builder.dist(new NormalDistribution(0.0, 0.01));
+		// }
+		builder.inferenceWorkspaceMode(WorkspaceMode.SEPARATE);
+		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
+		builder.iterations(1);
+		builder.learningRate(0.01);
+		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
+		// builder.learningRateSchedule(lrSchedule);
+		// builder.updater(Updater.NESTEROVS);
+		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+		builder.updater(new Nesterovs(0.9));
+		// builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
+		// builder.l2(1e-3);
+		// builder.dropOut(0.5);
+
+		// if(algo != null)
+		// builder.optimizationAlgo(algo);
+		//
+		ListBuilder listbuilder = builder.list();
+
+		/*
+		 * ListBuilder listbuilder = new NeuralNetConfiguration.Builder() .seed(seed)
+		 * //.weightInit(WeightInit.XAVIER) //.weightInit(WeightInit.RELU)
+		 * .weightInit(weight) .dist(new NormalDistribution(0.0, 0.01))
+		 * 
+		 * //.activation(Activation.RELU) //.updater(new Nesterovs(0.9))
+		 * //.updater(Updater.NESTEROVS) //.updater(Updater. .iterations(1) //
+		 * .gradientNormalization(GradientNormalization.RenormalizeL2PerLayer) //
+		 * normalize to prevent vanishing or exploding gradients
+		 * //.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
+		 * //.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+		 * //.learningRate(0.01) .learningRateDecayPolicy(LearningRatePolicy.Schedule)
+		 * .learningRateSchedule(lrSchedule) // .biasLearningRate(1e-2*2) //
+		 * .learningRateDecayPolicy(LearningRatePolicy.Step)
+		 * //.learningRateDecayPolicy(LearningRatePolicy.Step) //
+		 * .lrPolicyDecayRate(0.1) // .lrPolicySteps(100000) //.regularization(true) //
+		 * .l2(5 * 1e-4) .list();
+		 */
+		listbuilder.layer(0,
+				convInit("cnn1", channels, 50, new int[] { 7, 7 }, new int[] { 1, 1 }, new int[] { 0, 0 }, 0));
+		// listbuilder.layer(1, new
+		// LocalResponseNormalization.Builder().name("lrn1").build());
+		//listbuilder.layer(1, maxPool("maxpool1", new int[] { 2, 2 }));
+		listbuilder.layer(1, conv5x5("cnn" + 2, 64, new int[] { 5, 5 }, new int[] { 0, 0 }, nonZeroBias));
+		int counter = 0;
+		int cnncounter = 2;
+		for (int i = 1; i <= amount_conv_layer; i++) {
+
+			// listbuilder.layer(i+2, conv3x3("cnn"+i+2, 256, new int[] {1,1}, new int[]
+			// {2,2}, nonZeroBias));
+			listbuilder.layer(cnncounter, conv3x3("cnn" + i + 2, 64, nonZeroBias));
+			cnncounter++;
+			// listbuilder.layer(i+1, conv5x5("cnn"+i+2,100,new int[] {5,5},new int[]
+			// {0,0},nonZeroBias));
+			// cnncounter = cnncounter+4;
+			// counter = i+4;
+		}
+		// cnncounter++;
+		listbuilder.layer(cnncounter, new LocalResponseNormalization.Builder().name("lrn2" + cnncounter).build());
+		cnncounter++;
+		if(maxpool)
+		{
+			listbuilder.layer(cnncounter, maxPool("maxpool" + cnncounter, new int[] { 2, 2 }));
+			cnncounter++;
+		}
+		counter = cnncounter;
+		listbuilder.layer(counter,
+				fullyConnected("ffn" + counter, 1024, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+		counter++;
+		listbuilder.layer(counter + 1,fullyConnected("ffn" + counter + 1, 512, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+		counter++;
+		
+		if(amount_fcc > 0)
+		{
+			listbuilder.layer(counter,fullyConnected("ffn" + counter + 1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+			counter++;
+		}
+		listbuilder.layer(counter,
+				new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).name("output").nOut(2)
+						// .nIn(256)
+						.activation(Activation.SOFTMAX).build());
+		listbuilder.backprop(true);
+		listbuilder.pretrain(false);
+		listbuilder.setInputType(InputType.convolutional(height, width, channels));
+		MultiLayerConfiguration conf_test = listbuilder.build();
+
+		return new MultiLayerNetwork(conf_test);
+		
+		
+		
+		
+	}
+	
 	private static MultiLayerNetwork own(int amount_conv_layer) {
 		double nonZeroBias = 0;// 1;
 		double dropOut = 0.5;

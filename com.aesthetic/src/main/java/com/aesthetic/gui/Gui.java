@@ -131,7 +131,7 @@ public class Gui extends JFrame{
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "1. Download to Database", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel.setBounds(10, 76, 417, 203);
+		panel.setBounds(10, 76, 483, 203);
 		getContentPane().add(panel);
 		panel.setLayout(null);
 		
@@ -260,7 +260,7 @@ public class Gui extends JFrame{
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(null, "2. Prepare for CNN", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel_1.setBounds(10, 280, 417, 98);
+		panel_1.setBounds(10, 279, 483, 98);
 		getContentPane().add(panel_1);
 		
 		JButton btnNewButton = new JButton("Extract");
@@ -380,10 +380,21 @@ public class Gui extends JFrame{
 				
 			}
 		});
+		
+		JButton btnNewButton_3 = new JButton("blur");
+		btnNewButton_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				if(new File(inputpath2).exists())
+				{
+				CreateImage.blurimage(inputpath2, outpath_2);
+				}
+			}
+		});
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_1.createSequentialGroup()
+				.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createSequentialGroup()
@@ -394,42 +405,45 @@ public class Gui extends JFrame{
 							.addComponent(txt2DefineInputPath, GroupLayout.PREFERRED_SIZE, 221, GroupLayout.PREFERRED_SIZE)
 							.addGap(6)
 							.addComponent(btn_2_inputpath, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+					.addGap(26)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(btnNewButton, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(btnAva, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnCrop, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
-						.addGroup(Alignment.TRAILING, gl_panel_1.createParallelGroup(Alignment.LEADING)
-							.addComponent(btnAva)
-							.addComponent(btnNewButton)))
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addGap(11)
+							.addComponent(btnCrop, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_1.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnNewButton_3, GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-								.addComponent(txtDefinePath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnNewButton_1))
-							.addPreferredGap(ComponentPlacement.UNRELATED))
-						.addGroup(gl_panel_1.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_1.createSequentialGroup()
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+							.addComponent(txtDefinePath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnNewButton_1)
 							.addComponent(btnNewButton)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnAva)
-							.addPreferredGap(ComponentPlacement.RELATED)))
+							.addComponent(btnNewButton_3))
+						.addPreferredGap(ComponentPlacement.UNRELATED))
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGap(1)
 							.addComponent(txt2DefineInputPath, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 							.addComponent(btn_2_inputpath)
-							.addComponent(btnCrop))))
+							.addComponent(btnAva)
+							.addComponent(btnCrop)))
+					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		panel_1.setLayout(gl_panel_1);
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "3. Find Architecture", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel_2.setBounds(10, 377, 417, 196);
+		panel_2.setBounds(10, 377, 483, 196);
 		getContentPane().add(panel_2);
 		panel_2.setLayout(null);
 		
@@ -615,7 +629,7 @@ public class Gui extends JFrame{
 		panel_4.add(rdbtnAlexnet);
 		
 		JPanel panel_3 = new JPanel();
-		panel_3.setBounds(13, 586, 414, 108);
+		panel_3.setBounds(10, 577, 480, 108);
 		getContentPane().add(panel_3);
 		panel_3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "4. Try Model", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel_3.setLayout(null);
