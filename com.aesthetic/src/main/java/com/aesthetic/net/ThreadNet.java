@@ -84,6 +84,7 @@ import org.deeplearning4j.optimize.api.IterationListener;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.deeplearning4j.ui.api.UIServer;
 import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.FileStatsStorage;
 import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
 import org.deeplearning4j.zoo.ZooModel;
@@ -536,12 +537,13 @@ public class ThreadNet implements Runnable {
 		 */
 		listbuilder.layer(0,
 				convInit("cnn1", channels, 64, new int[] { 11, 11 }, new int[] { 1, 1 }, new int[] { 0, 0 }, 0));
-		// listbuilder.layer(1, new
-		// LocalResponseNormalization.Builder().name("lrn1").build());
-		//listbuilder.layer(1, maxPool("maxpool1", new int[] { 2, 2 }));
-		listbuilder.layer(1, conv5x5("cnn" + 2, 64, new int[] { 2, 2 }, new int[] { 0, 0 }, nonZeroBias));
+		listbuilder.layer(1, new LocalResponseNormalization.Builder().name("lrn1").build());
+		listbuilder.layer(2, maxPool("maxpool1", new int[] { 2, 2 }));
+		listbuilder.layer(3, conv5x5("cnn" + 2, 64, new int[] { 2, 2 }, new int[] { 0, 0 }, nonZeroBias));
+		listbuilder.layer(4, new LocalResponseNormalization.Builder().name("lrn1").build());
+		listbuilder.layer(5, maxPool("maxpool2", new int[] { 2, 2 }));
 		int counter = 0;
-		int cnncounter = 2;
+		int cnncounter = 6;
 		for (int i = 1; i <= amount_conv_layer; i++) {
 
 			// listbuilder.layer(i+2, conv3x3("cnn"+i+2, 256, new int[] {1,1}, new int[]
@@ -857,7 +859,20 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 				listeners.add(new ScoreIterationListener(10));
 				network.setListeners(listeners);
 			} else {
-				network.setListeners(new ScoreIterationListener(10));
+				int tmp_counter = 0;
+				tmp_model_path = path_model + "\\modelconfig" + tmp_counter + ".dl4j";
+				while (new File(tmp_model_path).exists()) {
+					tmp_counter++;
+					tmp_model_path = path_model + "\\modelconfig" + tmp_counter + ".dl4j";
+				}
+				
+				
+				
+					File statsFile = new File(tmp_model_path);
+		           StatsStorage filestorage = new FileStatsStorage(statsFile);
+		            network.setListeners(new StatsListener(filestorage), new ScoreIterationListener(10));
+				
+				//network.setListeners(new ScoreIterationListener(10));
 			}
 
 		}
