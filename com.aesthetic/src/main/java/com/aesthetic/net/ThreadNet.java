@@ -834,8 +834,8 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 		if (networkType == NetworkType.OWN) {
 			network = null;
 			LOGGER.info("BUILD MODEL with Layers: " + amountoflayers );
-			network = own(amountoflayers);
-			//network = newown(amountoflayers,maxp,amountoffcc);
+			//network = own(amountoflayers);
+			network = newown(amountoflayers,maxp,amountoffcc);
 			// Nd4j.getMemoryManager().setAutoGcWindow(5000);
 			network.init();
 		}
