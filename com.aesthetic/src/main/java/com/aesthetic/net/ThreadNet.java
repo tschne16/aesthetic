@@ -501,7 +501,7 @@ public class ThreadNet implements Runnable {
 		// builder.learningRateSchedule(lrSchedule);
 		// builder.updater(Updater.NESTEROVS);
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
-		builder.updater(new Nesterovs(0.9));
+		//builder.updater(new Nesterovs(0.9));
 		// builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
 		// builder.l2(1e-3);
 		// builder.dropOut(0.5);
