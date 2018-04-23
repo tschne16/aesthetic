@@ -469,7 +469,7 @@ public class ThreadNet implements Runnable {
 	
 	private static MultiLayerNetwork newown(int amount_conv_layer, boolean maxpool, int amount_fcc)
 	{
-		double nonZeroBias = 1;// 1;
+		double nonZeroBias = 0;// 1;
 		double dropOut = 0.5;
 
 		// ZU probierende Learningrates
@@ -496,6 +496,9 @@ public class ThreadNet implements Runnable {
 		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.iterations(1);
 		builder.learningRate(0.001);
+		
+		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+		builder.updater(new Nesterovs(0.9));
 		//builder.learningRateDecayPolicy(LearningRatePolicy.)
 		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
 		// builder.learningRateSchedule(lrSchedule);
