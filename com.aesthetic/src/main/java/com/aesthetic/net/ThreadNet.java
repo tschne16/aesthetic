@@ -559,7 +559,7 @@ public class ThreadNet implements Runnable {
 		listbuilder.layer(counter,
 				fullyConnected("ffn" + counter, 1024, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
 		counter++;
-		listbuilder.layer(counter + 1,fullyConnected("ffn" + counter + 1, 512, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+		listbuilder.layer(counter,fullyConnected("ffn" + counter + 1, 512, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
 		counter++;
 		
 		if(amount_fcc > 0)
