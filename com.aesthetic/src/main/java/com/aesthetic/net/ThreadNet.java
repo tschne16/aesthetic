@@ -500,7 +500,7 @@ public class ThreadNet implements Runnable {
 		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
 		// builder.learningRateSchedule(lrSchedule);
 		// builder.updater(Updater.NESTEROVS);
-		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
+		//builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		//builder.updater(new Nesterovs(0.9));
 		// builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
 		// builder.l2(1e-3);
@@ -552,13 +552,12 @@ public class ThreadNet implements Runnable {
 		}
 		// cnncounter++;
 		
-		if(maxpool)
-		{
+
 			listbuilder.layer(cnncounter, new LocalResponseNormalization.Builder().name("lrn2" + cnncounter).build());
 			cnncounter++;
 			listbuilder.layer(cnncounter, maxPool("maxpool" + cnncounter, new int[] { 2, 2 }));
 			cnncounter++;
-		}
+		
 		
 		counter = cnncounter;
 		listbuilder.layer(counter,
