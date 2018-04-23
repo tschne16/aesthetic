@@ -551,10 +551,11 @@ public class ThreadNet implements Runnable {
 			// counter = i+4;
 		}
 		// cnncounter++;
-		listbuilder.layer(cnncounter, new LocalResponseNormalization.Builder().name("lrn2" + cnncounter).build());
-		cnncounter++;
+		
 		if(maxpool)
 		{
+			listbuilder.layer(cnncounter, new LocalResponseNormalization.Builder().name("lrn2" + cnncounter).build());
+			cnncounter++;
 			listbuilder.layer(cnncounter, maxPool("maxpool" + cnncounter, new int[] { 2, 2 }));
 			cnncounter++;
 		}
