@@ -509,7 +509,7 @@ public class ThreadNet implements Runnable {
 		// if(algo != null)
 		// builder.optimizationAlgo(algo);
 		//
-		builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
+		//builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
 		//builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		ListBuilder listbuilder = builder.list();
 
