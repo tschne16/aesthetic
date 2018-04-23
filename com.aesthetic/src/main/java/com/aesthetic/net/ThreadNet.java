@@ -174,7 +174,7 @@ public class ThreadNet implements Runnable {
 	private boolean maxp;
 	private volatile String confusionmatrix;
 	private boolean showinbrowser = true;
-
+	private String name = "";
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
@@ -194,7 +194,7 @@ public class ThreadNet implements Runnable {
 		epochscounter = epoch;
 		maxp = max;
 		amountoffcc = fc;
-		
+		name = getSaltString();
 	}
 
 	public static MultiLayerNetwork Kao() {
@@ -860,10 +860,10 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 				network.setListeners(listeners);
 			} else {
 				int tmp_counter = 0;
-				tmp_model_path = path_model + "\\modelconfig" + tmp_counter + ".dl4j";
+				tmp_model_path = path_model + "\\" + name +"_modelconfig" + tmp_counter + ".dl4j";
 				while (new File(tmp_model_path).exists()) {
 					tmp_counter++;
-					tmp_model_path = path_model + "\\modelconfig" + tmp_counter + ".dl4j";
+					tmp_model_path = path_model + "\\" + name + "_modelconfig" + tmp_counter + ".dl4j";
 				}
 				
 				
@@ -941,10 +941,10 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 			int zaehler = 1;
 			File create = new File(output_path + "\\Textfiles");
 			create.mkdirs();
-			String txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
+			String txt_pfad = output_path + "\\Textfiles\\" + name + "_config" + zaehler + ".txt";
 			while (new File(txt_pfad).exists()) {
 				zaehler++;
-				txt_pfad = output_path + "\\Textfiles\\config" + zaehler + ".txt";
+				txt_pfad = output_path + "\\Textfiles\\"+ name + "_config" + zaehler + ".txt";
 			}
 			if (eval.accuracy() > accuracy) {
 
@@ -982,10 +982,10 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 			// Model m = result.getBestModel();
 
 			int counter = 0;
-			 tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
+			 tmp_model_path = path_model + "\\" + name + "_modelconfig" + counter + ".zip";
 			while (new File(tmp_model_path).exists()) {
 				counter++;
-				tmp_model_path = path_model + "\\modelconfig" + counter + ".zip";
+				tmp_model_path = path_model + "\\" + name + "_modelconfig" + counter + ".zip";
 			}
 
 			if (networkType != NetworkType.GoogleNet) {
@@ -1068,6 +1068,17 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 		this.confusionmatrix = confusionmatrix;
 	}
 
-	
+	protected String getSaltString() {
+        String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder salt = new StringBuilder();
+        Random rnd = new Random();
+        while (salt.length() < 5) { // length of the random string.
+            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+            salt.append(SALTCHARS.charAt(index));
+        }
+        String saltStr = salt.toString();
+        return saltStr;
+
+    }
 
 }
