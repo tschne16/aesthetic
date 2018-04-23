@@ -194,7 +194,7 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 	        String cvsSplitBy = ";";
 	        int counter = 120072;
 	        String foldername = "train data";
-	        int tmp_zaehler = 0;
+	        int tmp_zaehler = -1;
 	        String output =  FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\DATASET_CSV_FLICKR";
 	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
 
@@ -222,7 +222,7 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 	                // use comma as separator
 	                String[] attributes = line.split(cvsSplitBy);
 	                
-	                String val = attributes[2].replace(',', '.');
+	                String val = attributes[1].replace(',', '.');
 	                double res = Double.parseDouble(val);
 	                String subfolder = "not aesthetic";
 	                if(res > 0.03)
