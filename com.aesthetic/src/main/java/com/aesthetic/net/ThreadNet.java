@@ -556,6 +556,7 @@ public class ThreadNet implements Runnable {
 			listbuilder.layer(cnncounter, maxPool("maxpool" + cnncounter, new int[] { 2, 2 }));
 			cnncounter++;
 		}
+		
 		counter = cnncounter;
 		listbuilder.layer(counter,
 				fullyConnected("ffn" + counter, 1024, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
