@@ -495,7 +495,8 @@ public class ThreadNet implements Runnable {
 		builder.inferenceWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.iterations(1);
-		builder.learningRate(0.01);
+		builder.learningRate(0.001);
+		//builder.learningRateDecayPolicy(LearningRatePolicy.)
 		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
 		// builder.learningRateSchedule(lrSchedule);
 		// builder.updater(Updater.NESTEROVS);
@@ -529,11 +530,11 @@ public class ThreadNet implements Runnable {
 		 * .l2(5 * 1e-4) .list();
 		 */
 		listbuilder.layer(0,
-				convInit("cnn1", channels, 50, new int[] { 7, 7 }, new int[] { 1, 1 }, new int[] { 0, 0 }, 0));
+				convInit("cnn1", channels, 64, new int[] { 11, 11 }, new int[] { 2, 2 }, new int[] { 0, 0 }, 0));
 		// listbuilder.layer(1, new
 		// LocalResponseNormalization.Builder().name("lrn1").build());
 		//listbuilder.layer(1, maxPool("maxpool1", new int[] { 2, 2 }));
-		listbuilder.layer(1, conv5x5("cnn" + 2, 64, new int[] { 5, 5 }, new int[] { 0, 0 }, nonZeroBias));
+		listbuilder.layer(1, conv5x5("cnn" + 2, 64, new int[] { 2, 2 }, new int[] { 0, 0 }, nonZeroBias));
 		int counter = 0;
 		int cnncounter = 2;
 		for (int i = 1; i <= amount_conv_layer; i++) {
