@@ -16,6 +16,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -26,6 +27,7 @@ import org.imgscalr.Scalr;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileSystemView;
 
 import com.aesthetic.main.DBHelper;
 import com.aesthetic.main.Info;
@@ -184,7 +186,85 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 	public static void main(String[] args) throws Exception {
 		
 		
-		String path = "C:\\Users\\Torben\\Desktop\\DOGLANDSCAPE";
+		String csvFile = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\base64.csv";
+		
+		//
+		   //String csvFile = "/Users/mkyong/csv/country.csv";
+	        String line = "";
+	        String cvsSplitBy = ";";
+	        int counter = 120072;
+	        String foldername = "train data";
+	        int tmp_zaehler = 0;
+	        String output =  FileSystemView.getFileSystemView().getDefaultDirectory().getPath() + "\\DATASET_CSV_FLICKR";
+	        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+
+	            while ((line = br.readLine()) != null) {
+
+	            	if(tmp_zaehler == -1)
+	            	{
+	            		tmp_zaehler ++;
+	            	continue;
+	            	}
+	            	
+	            	tmp_zaehler++;
+	            	
+	            if((double) counter*0.8< (double)tmp_zaehler)
+	            {
+	            	foldername = "test data";
+	            }
+	            else
+	            {
+	            	foldername = "train data";
+	            }
+	            	
+	            
+	            	
+	                // use comma as separator
+	                String[] attributes = line.split(cvsSplitBy);
+	                
+	                String val = attributes[2].replace(',', '.');
+	                double res = Double.parseDouble(val);
+	                String subfolder = "not aesthetic";
+	                if(res > 0.03)
+	                {
+	                	
+	                	subfolder = "aesthetic";
+	                	
+	                }
+	                Info inf =  new Info();
+	                
+	              inf.setBase64(attributes[0]);
+	              
+	            
+	              
+	              new File(output + "\\" + foldername + "\\" + subfolder ).mkdirs();
+	              
+	              
+	              String tmp_path = output + "\\" + foldername + "\\" + subfolder ;
+	              
+	              String filetyp = attributes[3];
+	              
+	              if(filetyp == null)
+	            	  filetyp = "jpg";
+	              
+	              Decode64AndWriteToFile(attributes[0], tmp_path, Long.parseLong(attributes[2]), attributes[3]);
+	                
+	                //System.out.println("Country [code= " + country[4] + " , name=" + country[5] + "]");
+
+	            }
+
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+
+	    
+		
+		
+		
+		
+	/*	
+		
+		
 		
 		
 		File output = new File(path);
