@@ -208,7 +208,7 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 	            	
 	            	tmp_zaehler++;
 	            	
-	            if((double) counter*0.8< (double)tmp_zaehler)
+	            if((double) counter*0.9< (double)tmp_zaehler)
 	            {
 	            	foldername = "test data";
 	            }
@@ -225,7 +225,7 @@ public class StructureGenerator extends SwingWorker<Void, Integer> {
 	                String val = attributes[1].replace(',', '.');
 	                double res = Double.parseDouble(val);
 	                String subfolder = "not aesthetic";
-	                if(res > 0.03)
+	                if(res > 0.04)
 	                {
 	                	
 	                	subfolder = "aesthetic";
