@@ -37,18 +37,16 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		accuracies = new ArrayList<Double>();
 		for (int i = cnn_min; i <= cnn_max; i++) {
 			for (int x = 0; x <= fcc; x++) {
-				
-				for(int y = 0;y <=1;y++)
-				{
-				Boolean maxpol = y == 1;
-				
+
+				Boolean maxpol = true;
+
 				ThreadNet convnet = new ThreadNet(train_path, test_path, model_path, nettype, showinb, i, batchsize,
-						epochs,fcc,maxpol);
+						epochs, fcc, maxpol);
 
 				publish("CONFIGURATION : EPOCHS: " + epochs + " Batchsize:" + batchsize);
 
 				publish("STARTING! Using additional layers: " + i);
-				publish("USING 1 MORE FULLY CONNECTED LAYER:" + (x==1));
+				publish("USING 1 MORE FULLY CONNECTED LAYER:" + (x == 1));
 				publish("USING 1 MAXPOOL LAYER:" + maxpol);
 				Thread t = new Thread(convnet);
 				t.start();
@@ -57,7 +55,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 				accuracies.add(convnet.getAccuracy());
 				publish("ACCURACY " + Double.toString(convnet.getAccuracy()));
 				publish(convnet.getConfusionmatrix());
-				
+
 				if (bestaccuracy < convnet.getAccuracy()) {
 					bestaccuracy = convnet.getAccuracy();
 					jlabel.setText(Double.toString(bestaccuracy));
@@ -69,7 +67,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 				convnet = null;
 				publish("RESTING A BIT....");
 				Thread.sleep(5000);
-				}
+
 			}
 		}
 
