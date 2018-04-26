@@ -36,12 +36,13 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	protected Void doInBackground() throws Exception {
 		accuracies = new ArrayList<Double>();
 		for (int i = cnn_min; i <= cnn_max; i++) {
+			
 			for (int x = 0; x <= fcc; x++) {
 
 				Boolean maxpol = true;
 
 				ThreadNet convnet = new ThreadNet(train_path, test_path, model_path, nettype, showinb, i, batchsize,
-						epochs, fcc, maxpol);
+						epochs, x, maxpol);
 
 				publish("CONFIGURATION : EPOCHS: " + epochs + " Batchsize:" + batchsize);
 
