@@ -488,7 +488,7 @@ public class ThreadNet implements Runnable {
 		// builder.setConvolutionMode(ConvolutionMode.Same);
 		// builder.setMiniBatch(miniBatch);
 		// builder.setUseRegularization(true);
-		builder.regularization(false).l2(0.0005);
+		builder.regularization(true).l2(0.0005);
 		// builder.convolutionMode(ConvolutionMode.Same);
 		// if(weight == WeightInit.DISTRIBUTION)
 		// {
@@ -497,7 +497,7 @@ public class ThreadNet implements Runnable {
 		builder.inferenceWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.iterations(1);
-		builder.learningRate(0.001);
+		builder.learningRate(0.0001);
 		
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		builder.updater(new Nesterovs(0.9));
@@ -507,7 +507,7 @@ public class ThreadNet implements Runnable {
 		// builder.updater(Updater.NESTEROVS);
 		//builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		//builder.updater(new Nesterovs(0.9));
-		// builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
+			builder.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer);
 		// builder.l2(1e-3);
 		// builder.dropOut(0.5);
 
@@ -567,14 +567,14 @@ public class ThreadNet implements Runnable {
 		
 		counter = cnncounter;
 		listbuilder.layer(counter,
-				fullyConnected("ffn" + counter, 1024, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+				fullyConnected("ffn" + counter, 1000, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
 		counter++;
-		listbuilder.layer(counter,fullyConnected("ffn" + counter + 1, 512, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+		listbuilder.layer(counter,fullyConnected("ffn" + counter + 1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
 		counter++;
 		
 		if(amount_fcc > 0)
 		{
-			listbuilder.layer(counter,fullyConnected("ffn" + counter + 1, 256, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
+			listbuilder.layer(counter,fullyConnected("ffn" + counter + 1, 128, nonZeroBias, dropOut, new GaussianDistribution(0, 0.005)));
 			counter++;
 		}
 		listbuilder.layer(counter,
