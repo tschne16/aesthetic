@@ -216,7 +216,7 @@ public class ThreadNet implements Runnable {
 		epochscounter = epoch;
 		maxp = max;
 		amountoffcc = fc;
-		name = getSaltString();
+		name = getSaltString() + "-" + amountoflayers + "-" + amountoffcc;
 	}
 
 	public static MultiLayerNetwork Kao() {
@@ -879,6 +879,17 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 				uiServer.attach(statsStorage);
 				listeners.add(new StatsListener(statsStorage, listenerFrequency));
 				listeners.add(new ScoreIterationListener(10));
+				int tmp_counter = 0;
+				
+				tmp_model_path = path_model + "\\" + name +"_modelconfig" + tmp_counter + ".dl4j";
+				while (new File(tmp_model_path).exists()) {
+					tmp_counter++;
+					tmp_model_path = path_model + "\\" + name + "_modelconfig" + tmp_counter + ".dl4j";
+				}
+				
+				File statsFile = new File(tmp_model_path);
+		        StatsStorage filestorage = new FileStatsStorage(statsFile);
+		        listeners.add(new StatsListener(filestorage));
 				network.setListeners(listeners);
 			} else {
 				int tmp_counter = 0;
