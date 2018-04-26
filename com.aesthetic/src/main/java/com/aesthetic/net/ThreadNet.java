@@ -153,6 +153,16 @@ public class ThreadNet implements Runnable {
 	private static String bestNetwork;
 	private volatile double accuracy = 0;
 	private volatile String tmp_model_path;
+	private volatile String tmp_model_name;
+	
+	public String getTmp_model_name() {
+		return tmp_model_name;
+	}
+
+	public void setTmp_model_name(String tmp_model_name) {
+		this.tmp_model_name = tmp_model_name;
+	}
+
 	public String getTmp_model_path() {
 		return tmp_model_path;
 	}
@@ -178,7 +188,15 @@ public class ThreadNet implements Runnable {
 	private boolean maxp;
 	private volatile String confusionmatrix;
 	private boolean showinbrowser = true;
-	private String name = "";
+	private volatile String name = "";
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 

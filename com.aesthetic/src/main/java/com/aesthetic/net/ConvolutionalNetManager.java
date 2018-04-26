@@ -62,6 +62,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 					jlabel.setText(Double.toString(bestaccuracy));
 					additional.setText(Integer.toString(i));
 					bestmodel_path = convnet.getTmp_model_path();
+					bestmodel = convnet.getName();
 					bestnumber = i;
 				}
 
@@ -78,7 +79,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		publish("Best Number of additional Layer: " + bestnumber);
 		publish("# of Epochs: " + epochs);
 		publish("batchsize: " + batchsize);
-
+		publish("Model Name:" + bestmodel);
 		return null;
 	}
 
