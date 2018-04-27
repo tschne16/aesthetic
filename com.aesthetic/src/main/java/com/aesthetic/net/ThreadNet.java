@@ -518,11 +518,19 @@ public class ThreadNet implements Runnable {
 		builder.inferenceWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.iterations(1);
-		builder.learningRate(0.1);
-		builder.learningRateDecayPolicy(LearningRatePolicy.Step); //
-		 builder.lrPolicyDecayRate(0.1).lrPolicySteps(10000);
+		builder.learningRate(0.001);
+//		builder.learningRateDecayPolicy(LearningRatePolicy.Step); //
+		// builder.lrPolicyDecayRate(0.1).lrPolicySteps(10000);
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		builder.updater(new Nesterovs(0.9));
+	/*	builder.updater(Nesterovs.builder()
+                .learningRate(1e-3)
+                .momentum(0.9)
+                .learningRateSchedule(new StepSchedule(
+                        ScheduleType.EPOCH,
+                        1e-2,
+                        0.1,
+                        20));*/
 		//builder.learningRateDecayPolicy(LearningRatePolicy.)
 		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
 		// builder.learningRateSchedule(lrSchedule);
