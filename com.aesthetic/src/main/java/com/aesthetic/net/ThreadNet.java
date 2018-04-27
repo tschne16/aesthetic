@@ -509,7 +509,7 @@ public class ThreadNet implements Runnable {
 		// builder.setConvolutionMode(ConvolutionMode.Same);
 		// builder.setMiniBatch(miniBatch);
 		// builder.setUseRegularization(true);
-		builder.regularization(true).l2(0.0005);
+		builder.regularization(false).l2(0.0005);
 		// builder.convolutionMode(ConvolutionMode.Same);
 		// if(weight == WeightInit.DISTRIBUTION)
 		// {
@@ -518,7 +518,7 @@ public class ThreadNet implements Runnable {
 		builder.inferenceWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.iterations(1);
-		builder.learningRate(0.0001);
+		builder.learningRate(0.01);
 		
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		builder.updater(new Nesterovs(0.9));
@@ -992,6 +992,7 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 			// writer.println("Anzahl CNN LAYER :" + i);
 			writer.println("BatchSize :" + batchSize);
 			writer.println("Accurancy:" + eval.accuracy());
+			//writer.println("Learning Rate:" + network.getLayerWiseConfigurations().getl)
 			writer.println("Confusion Matrix:" + eval.getConfusionMatrix());
 			writer.println("EXCLUDED 1 Class from Predicition ? : " + (1== eval.averageF1NumClassesExcluded()));
 			writer.println("ADDITIONAL CNN:" + amountoflayers);
