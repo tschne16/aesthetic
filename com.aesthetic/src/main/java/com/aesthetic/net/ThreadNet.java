@@ -509,7 +509,7 @@ public class ThreadNet implements Runnable {
 		// builder.setConvolutionMode(ConvolutionMode.Same);
 		// builder.setMiniBatch(miniBatch);
 		// builder.setUseRegularization(true);
-		builder.regularization(false).l2(0.0005);
+		builder.regularization(true).l2(1e-5);
 		// builder.convolutionMode(ConvolutionMode.Same);
 		// if(weight == WeightInit.DISTRIBUTION)
 		// {
