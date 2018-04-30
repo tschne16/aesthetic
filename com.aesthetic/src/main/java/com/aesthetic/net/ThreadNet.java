@@ -518,9 +518,9 @@ public class ThreadNet implements Runnable {
 		builder.inferenceWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.iterations(1);
-		builder.learningRate(0.1);
-		builder.learningRateDecayPolicy(LearningRatePolicy.Score);
-		builder.lrPolicyDecayRate(0.1);
+		builder.learningRate(0.001);
+		//builder.learningRateDecayPolicy(LearningRatePolicy.Score);
+		//builder.lrPolicyDecayRate(0.1);
 //		builder.learningRateDecayPolicy(LearningRatePolicy.Step); //
 		// builder.lrPolicyDecayRate(0.1).lrPolicySteps(10000);
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
@@ -583,8 +583,8 @@ public class ThreadNet implements Runnable {
 			// {2,2}, nonZeroBias));
 			listbuilder.layer(cnncounter, conv3x3("cnn" + i + 2, 64, nonZeroBias));
 			cnncounter++;
-			listbuilder.layer(cnncounter, maxPool("maxpool1"+cnncounter, new int[] { 2, 2 }));
-			cnncounter++;
+			//listbuilder.layer(cnncounter, maxPool("maxpool1"+cnncounter, new int[] { 2, 2 }));
+			//cnncounter++;
 			// listbuilder.layer(i+1, conv5x5("cnn"+i+2,100,new int[] {5,5},new int[]
 			// {0,0},nonZeroBias));
 			// cnncounter = cnncounter+4;
