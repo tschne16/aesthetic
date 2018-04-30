@@ -519,8 +519,8 @@ public class ThreadNet implements Runnable {
 		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.iterations(1);
 		builder.learningRate(0.001);
-		//builder.learningRateDecayPolicy(LearningRatePolicy.Score);
-		//builder.lrPolicyDecayRate(0.1);
+		builder.learningRateDecayPolicy(LearningRatePolicy.Score);
+		builder.lrPolicyDecayRate(0.1);
 //		builder.learningRateDecayPolicy(LearningRatePolicy.Step); //
 		// builder.lrPolicyDecayRate(0.1).lrPolicySteps(10000);
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
@@ -922,6 +922,9 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 			}
 
 		}
+		
+		
+		
 		// MultiLayerNetwork
 		// MultiLayerNetwork network = lenetModel();
 		// network.init();
@@ -939,7 +942,7 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 				
 				try {
 					DataSet testSet = dataIter.next();
-					LOGGER.info("TESTSET HAT EINTRÄGE: " + testSet.getLabels().sum(0));
+					//LOGGER.info("TESTSET HAT EINTRÄGE: " + testSet.getLabels().sum(0));
 					// system.out.println(testSet);
 					// System.out.println(testSet.getLabels());
 					testSet.shuffle();
@@ -957,6 +960,7 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 					LOGGER.info("FAILED to train Network! " + e.getMessage());
 				}
 			}
+			LOGGER.info("EPOCHSCOUNTER:" + w + " Verbleibend:" + (epochscounter - (w +1)));
 		}
 		
 		recordReader.reset();
