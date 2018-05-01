@@ -496,11 +496,12 @@ public class ThreadNet implements Runnable {
 		double dropOut = 0.5;
 
 		// ZU probierende Learningrates
-		/*
-		 * Map<Integer, Double> lrSchedule = new HashMap<>(); lrSchedule.put(1, 0.05);
-		 * lrSchedule.put(200, 0.01); lrSchedule.put(300, 0.001); lrSchedule.put(500,
-		 * 0.0001); lrSchedule.put(600, 0.00001);
-		 */
+		
+		  Map<Integer, Double> lrSchedule = new HashMap<>(); lrSchedule.put(1, 0.1);
+		  lrSchedule.put(100,0.05);
+		  lrSchedule.put(200, 0.01); lrSchedule.put(500, 0.001); lrSchedule.put(1000,
+		  0.0005); lrSchedule.put(2000, 0.0001);
+		 
 		NeuralNetConfiguration.Builder builder = new NeuralNetConfiguration.Builder();
 		builder.seed(seed);
 		// builder.weightInit(weight);
@@ -508,7 +509,7 @@ public class ThreadNet implements Runnable {
 		builder.activation(Activation.RELU);
 		// builder.setConvolutionMode(ConvolutionMode.Same);
 		// builder.setMiniBatch(miniBatch);
-		// builder.setUseRegularization(true);
+		//builder.setUseRegularization(true);
 		builder.regularization(true).l2(1e-5);
 		// builder.convolutionMode(ConvolutionMode.Same);
 		// if(weight == WeightInit.DISTRIBUTION)
@@ -519,8 +520,8 @@ public class ThreadNet implements Runnable {
 		builder.trainingWorkspaceMode(WorkspaceMode.SEPARATE);
 		builder.iterations(1);
 		builder.learningRate(0.001);
-		builder.learningRateDecayPolicy(LearningRatePolicy.Score);
-		builder.lrPolicyDecayRate(0.1);
+		//builder.learningRateDecayPolicy(LearningRatePolicy.Score);
+		//builder.lrPolicyDecayRate(0.1);
 //		builder.learningRateDecayPolicy(LearningRatePolicy.Step); //
 		// builder.lrPolicyDecayRate(0.1).lrPolicySteps(10000);
 		builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
@@ -534,8 +535,8 @@ public class ThreadNet implements Runnable {
                         0.1,
                         20));*/
 		//builder.learningRateDecayPolicy(LearningRatePolicy.)
-		// builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
-		// builder.learningRateSchedule(lrSchedule);
+		builder.learningRateDecayPolicy(LearningRatePolicy.Schedule);
+		builder.learningRateSchedule(lrSchedule);
 		// builder.updater(Updater.NESTEROVS);
 		//builder.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT);
 		//builder.updater(new Nesterovs(0.9));

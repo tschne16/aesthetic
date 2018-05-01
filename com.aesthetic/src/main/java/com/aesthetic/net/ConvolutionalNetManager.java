@@ -35,8 +35,13 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	@Override
 	protected Void doInBackground() throws Exception {
 		accuracies = new ArrayList<Double>();
-		for (int i = cnn_min; i <= cnn_max; i++) {
-			
+		
+		//*** UNBEDINGT WIEDER ZURÜCKSETZEN
+		int[] tries = new int[] {0,3,5,8,11};
+		
+		//for (int i = cnn_min; i <= cnn_max; i++) {
+			for(int i : tries)
+			{
 			for (int x = 0; x <= fcc; x++) {
 
 				Boolean maxpol = true;
