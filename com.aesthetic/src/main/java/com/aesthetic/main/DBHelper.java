@@ -57,7 +57,7 @@ private static final Logger LOGGER = Logger.getLogger( DBHelper.class.getName() 
 
 public DBHelper(String d, String pw, String us, String u)
 {
-	 driver = d;
+	// driver = d;
      url = "jdbc:mysql://" + u + "?autoReconnect=true&useSSL=false";
      user = us;
      password = pw;
@@ -150,11 +150,11 @@ public static void getConnection() throws Exception {
 	if(conn == null)
 	{
 	String driver= "com.mysql.jdbc.Driver";
-    String url = "jdbc:mysql://localhost:3306/flickr?autoReconnect=true&useSSL=false";
-    String username = "root";
-    String password = "root";
+    //String url = "jdbc:mysql://localhost:3306/flickr?autoReconnect=true&useSSL=false";
+   // String user = "root";
+   // String password = "root";
     Class.forName(driver).newInstance();
-     conn = DriverManager.getConnection(url, username, password);
+     conn = DriverManager.getConnection(url, user, password);
     
 	}
 	else

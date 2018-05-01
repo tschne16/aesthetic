@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -58,9 +59,8 @@ public class Gui extends JFrame{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JPasswordField passwordField;
+	private JTextField textField_DBURL;
+	private JTextField textField_DBUSER;
 	private JSpinner spinner_desired;
 	public JProgressBar progressBar;
 	public FlickrCrawler worker;
@@ -100,6 +100,12 @@ public class Gui extends JFrame{
 	JCheckBox chckbxShowBrowser;
 	private JTextField txt2DefineInputPath;
 	JRadioButton rdbtnKaoEtAl;
+	private Preferences prefs;
+	private final String prefs_DB = "PREFS_DB";
+	private final String prefs_user = "PREFS_USER";
+	private final String prefs_password = "PREFS_PASSWORD";
+	private JTextField textField_password;
+	 
 	public Gui() throws Exception {
 		getContentPane().setLayout(null);
 		
@@ -107,27 +113,35 @@ public class Gui extends JFrame{
 		lblUrl.setBounds(10, 11, 46, 14);
 		getContentPane().add(lblUrl);
 		
-		textField = new JTextField();
-		textField.setBounds(57, 8, 154, 17);
-		getContentPane().add(textField);
-		textField.setColumns(10);
-		
+		textField_DBURL = new JTextField();
+		textField_DBURL.setBounds(57, 8, 154, 17);
+		getContentPane().add(textField_DBURL);
+		textField_DBURL.setColumns(10);
+		textField_DBURL.setToolTipText("ADRESSE/DBSCHEMA z.B. localhost:3306/flickr");
 		JLabel lblDbuser = new JLabel("DB-User");
 		lblDbuser.setBounds(10, 36, 46, 14);
 		getContentPane().add(lblDbuser);
 		
-		textField_1 = new JTextField();
-		textField_1.setBounds(57, 30, 154, 20);
-		getContentPane().add(textField_1);
-		textField_1.setColumns(10);
+		textField_DBUSER = new JTextField();
+		textField_DBUSER.setBounds(57, 30, 154, 20);
+		getContentPane().add(textField_DBUSER);
+		textField_DBUSER.setColumns(10);
 		
 		JLabel lblPasswort = new JLabel("Passwort");
 		lblPasswort.setBounds(10, 57, 46, 14);
 		getContentPane().add(lblPasswort);
 		
-		passwordField = new JPasswordField();
-		passwordField.setBounds(57, 57, 154, 17);
-		getContentPane().add(passwordField);
+		textField_password = new JTextField();
+		textField_password.setText("root");
+		textField_password.setColumns(10);
+		textField_password.setBounds(57, 54, 154, 20);
+		getContentPane().add(textField_password);
+		
+		
+		LoadPrefs();
+		
+		
+		
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "1. Download to Database", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -249,11 +263,16 @@ public class Gui extends JFrame{
 		getContentPane().add(btnCreate);
 		
 		JCheckBox chckbxStore = new JCheckBox("store");
-		chckbxStore.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-			
-				//JOptionPane.showMessageDialog(null, "stored");
-			}
+		chckbxStore.addItemListener(new ItemListener() {
+		    @Override
+		    public void itemStateChanged(ItemEvent e) {
+		        if(e.getStateChange() == ItemEvent.SELECTED) {//checkbox has been selected
+		            SavePrefs();
+		            chckbxStore.setSelected(true);
+		        } else {//checkbox has been deselected
+		            //do something...
+		        };
+		    }
 		});
 		chckbxStore.setBounds(217, 32, 51, 23);
 		getContentPane().add(chckbxStore);
@@ -828,6 +847,7 @@ public class Gui extends JFrame{
 		chckbxparams.setBounds(162, 162, 128, 23);
 		panel_2.add(chckbxparams);
 		
+
 		
 	}
 	
@@ -849,29 +869,40 @@ public class Gui extends JFrame{
 		return result;
 	}
 	
-	public class worker extends SwingWorker<Void, Integer>
-	{
 
-		@Override
-		protected Void doInBackground() throws Exception {
+	
+	public void LoadPrefs()
+	{
+		prefs = Preferences.userRoot().node(this.getClass().getName());
 		
-			
-			
-			return null;
-		}
+		if(prefs == null)
+			return;
 		
-		public void publishData(Integer i)
-		{
-			
-		}
+		textField_DBURL.setText(prefs.get(prefs_DB , ""));
+		textField_DBUSER.setText(prefs.get(prefs_user , ""));
 		
+		String pw = prefs.get(prefs_password,"");
+		String user =  prefs.get(prefs_user , "");
+		String DB_URL = prefs.get(prefs_DB , "");
 		
-		@Override
-		protected void process(List<Integer> chucks)
-		{
+		if((pw != "" && user != "" && DB_URL != "") == false) 
+				{
+				return;
+				}
 			
-			
-		}
+		
+		new DBHelper("", prefs.get(prefs_password,""), prefs.get(prefs_user , ""), prefs.get(prefs_DB , ""));
+		
+	}
+	public void SavePrefs()
+	{
+		prefs = Preferences.userRoot().node(this.getClass().getName());
+		prefs.put(prefs_DB,textField_DBURL.getText());
+		prefs.put(prefs_user, textField_DBUSER.getText());
+		
+		if(textField_password.getText() == null)
+			return;
+		prefs.put(prefs_password,textField_password.getText());
 		
 	}
 }
