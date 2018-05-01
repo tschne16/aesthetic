@@ -37,7 +37,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		accuracies = new ArrayList<Double>();
 		
 		//*** UNBEDINGT WIEDER ZURÜCKSETZEN
-		int[] tries = new int[] {0,3,5,8,11};
+		int[] tries = new int[] {1,3,5,8,11};
 		
 		//for (int i = cnn_min; i <= cnn_max; i++) {
 			for(int i : tries)
