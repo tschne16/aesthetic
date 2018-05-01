@@ -962,6 +962,7 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 				}
 			}
 			LOGGER.info("EPOCHSCOUNTER:" + w + " Verbleibend:" + (epochscounter - (w +1)));
+			dataIter.reset();
 		}
 		
 		recordReader.reset();
