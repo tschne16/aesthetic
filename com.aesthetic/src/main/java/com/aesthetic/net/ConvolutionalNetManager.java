@@ -17,7 +17,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 	private int batchsize = 15;
 	private int cnn_min = 1;
 	private int cnn_max = 6;
-	private int fcc = 1;
+	private int fcc = 0;
 	private boolean maxp;
 	private String train_path;
 	private String test_path;
@@ -37,7 +37,7 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		accuracies = new ArrayList<Double>();
 		
 		//*** UNBEDINGT WIEDER ZURÜCKSETZEN
-		int[] tries = new int[] {1,3,5,8,11};
+		int[] tries = new int[] {11,5,8,};
 		
 		//for (int i = cnn_min; i <= cnn_max; i++) {
 			for(int i : tries)
