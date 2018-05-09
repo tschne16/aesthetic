@@ -39,7 +39,8 @@ private JLabel lblPicture;
          lblPic = new JLabel("");
         lblPic.setBounds(289, 373, 46, 14);
         getContentPane().add(lblPic);
-        Image image = new ImageIcon(this.getClass().getResource("res/check.png")).getImage();
+                
+        Image image = new ImageIcon(this.getClass().getClassLoader().getResource("check.png")).getImage();
         lblPic.setVisible(false);
 		lblPic.setIcon(new ImageIcon(image));
 		
