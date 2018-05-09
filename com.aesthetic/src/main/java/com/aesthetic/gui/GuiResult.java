@@ -71,7 +71,7 @@ private JLabel lblPicture;
 		        if(myPicture != null )
 		        {
 		    		lblPicture = new JLabel(new ImageIcon(myPicture));
-		    		lblPicture.setBounds(25, 23, 301, 300);
+		    		lblPicture.setBounds(this.getWidth()/2 - 100, 23, myPicture.getHeight(), myPicture.getWidth());
 		    		getContentPane().add(lblPicture);
 		        }
 		        JButton btnNext = new JButton("next");
@@ -118,7 +118,7 @@ private JLabel lblPicture;
 		        		
 		        	}
 		        });
-		        btnNext.setBounds(335, 369, 89, 23);
+		        btnNext.setBounds(335, 379, 89, 23);
 		        getContentPane().add(btnNext);
 		        
 		        JLabel lblPrediction = new JLabel("Prediction:");
