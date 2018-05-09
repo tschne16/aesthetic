@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import javax.swing.JPanel;
 
@@ -38,9 +39,9 @@ private JLabel lblPicture;
          lblPic = new JLabel("");
         lblPic.setBounds(289, 373, 46, 14);
         getContentPane().add(lblPic);
-        ImageIcon image = new ImageIcon(GuiResult.class.getResource("res/check.png"));
+        Image image = new ImageIcon(GuiResult.class.getResource("res/check.png")).getImage();
         lblPic.setVisible(false);
-		lblPic.setIcon(image);
+		lblPic.setIcon(new ImageIcon(image));
 		
 		boolean visible = false;
 		if(results.size()>1)
