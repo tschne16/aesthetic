@@ -28,16 +28,16 @@ private JLabel lblPicture;
 		
 		all = results;
 		JLabel lblName = new JLabel("Name");
-		lblName.setBounds(79, 344, 345, 14);
+		lblName.setBounds(69, 344, 355, 14);
 		getContentPane().add(lblName);
 		
 		JLabel lblKlasse = new JLabel("Klasse");
-		lblKlasse.setBounds(79, 373, 200, 14);
+		lblKlasse.setBounds(69, 373, 210, 14);
 		getContentPane().add(lblKlasse);
 		
 		
          lblPic = new JLabel("");
-        lblPic.setBounds(289, 373, 46, 14);
+        lblPic.setBounds(289, 373, 46, 29);
         getContentPane().add(lblPic);
                 
         Image image = new ImageIcon(this.getClass().getClassLoader().getResource("check.png")).getImage();
