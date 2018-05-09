@@ -71,7 +71,7 @@ private JLabel lblPicture;
 		        if(myPicture != null )
 		        {
 		    		lblPicture = new JLabel(new ImageIcon(myPicture));
-		    		lblPicture.setBounds(this.getWidth()/2 - 100, 23, myPicture.getHeight(), myPicture.getWidth());
+		    		lblPicture.setBounds(this.getWidth()/2, 23, myPicture.getHeight(), myPicture.getWidth());
 		    		getContentPane().add(lblPicture);
 		        }
 		        JButton btnNext = new JButton("next");
