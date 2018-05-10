@@ -29,6 +29,7 @@ private JLabel lblPicture;
 		all = results;
 		JLabel lblName = new JLabel("Name");
 		lblName.setBounds(69, 344, 355, 14);
+		
 		getContentPane().add(lblName);
 		
 		JLabel lblKlasse = new JLabel("Klasse");

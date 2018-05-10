@@ -1010,6 +1010,7 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 			writer = new PrintWriter(txt_pfad, "UTF-8");
 			// writer.println("Anzahl CNN LAYER :" + i);
 			writer.println("BatchSize :" + batchSize);
+			writer.println("Epochen:" + epochscounter);
 			writer.println("Accurancy:" + eval.accuracy());
 			//writer.println("Learning Rate:" + network.getLayerWiseConfigurations().getl)
 			writer.println("Confusion Matrix:" + eval.getConfusionMatrix());
@@ -1026,6 +1027,8 @@ LOGGER.info("AMOUNT OF LAYERS - BEGINNING : " + amountoflayers);
 			NeuralNetConfiguration netconf = network.conf();
 			writer.println("LEARNING RATE POLICY:" + netconf.getLearningRatePolicy().toString());
 			writer.println("SEED:" + seed);
+			writer.println("Trainings-Datensatz:"+ train_path);
+			writer.println("Test-Datensatz:"+ test_path);
 			// writer.println("OptimizationAlgo:" + optialgo.toString());
 			writer.close();
 			writer = null;
