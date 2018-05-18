@@ -34,6 +34,7 @@ import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
@@ -197,9 +198,51 @@ public class ThreadNet implements Runnable {
 		this.name = name;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
+File testmodel = null;
+File testset = null;
 
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Choose Model");
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		int result = fileChooser.showOpenDialog(null);
+		if (result == JFileChooser.APPROVE_OPTION) {
+		    testmodel = fileChooser.getSelectedFile();
+		   // System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+		}
+		
+		 fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Choose Testset");
+		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
+		fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+		int result2 = fileChooser.showOpenDialog(null);
+		if (result2 == JFileChooser.APPROVE_OPTION) {
+		   testset = fileChooser.getSelectedFile();
+		 
+		}
+		Random RandNumGen = new Random(123);
+		FileSplit test = new FileSplit(testset, NativeImageLoader.ALLOWED_FORMATS, RandNumGen);
+		 MultiLayerNetwork restored = ModelSerializer.restoreMultiLayerNetwork(testmodel);
+		
+		Evaluation eval = new Evaluation(2);
+		ParentPathLabelGenerator labelMaker = new ParentPathLabelGenerator();
+		ImageRecordReader recordReader = new ImageRecordReader(224, 224, 3, labelMaker);
+		recordReader.initialize(test);
+		DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
+		DataSetIterator dataIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, 2);
+		
+		scaler.fit(dataIter);
+		dataIter.setPreProcessor(scaler);
+		
+		
+	DataSetIterator testIter = new RecordReaderDataSetIterator(recordReader, batchSize, 1, 2);
+	scaler.fit(testIter);
+		
+	eval = restored.evaluate(testIter);
+	
+	System.out.print(eval.accuracy());
+	System.out.print(eval.getConfusionMatrix());
 	}
 
 	public ThreadNet(String train, String test, String out, NetworkType nettype, boolean showinb, int amount, int batch,
