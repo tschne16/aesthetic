@@ -49,9 +49,11 @@ import com.aesthetic.main.DBHelper;
 import com.aesthetic.main.FlickrCrawler;
 import com.aesthetic.net.AVAStructureGeneratior;
 import com.aesthetic.net.ConvolutionalNetManager;
-import com.aesthetic.net.ConvolutionalNeuralNetwork;
+//import com.aesthetic.net.ConvolutionalNeuralNetwork;
 import com.aesthetic.net.NetworkType;
 import com.aesthetic.net.StructureGenerator;
+import com.aesthetic.net.ThreadNet;
+
 import javax.swing.JRadioButton;
 
 public class Gui extends JFrame{
@@ -64,7 +66,7 @@ public class Gui extends JFrame{
 	private JSpinner spinner_desired;
 	public JProgressBar progressBar;
 	public FlickrCrawler worker;
-	public ConvolutionalNeuralNetwork conv_worker;
+	//public ConvolutionalNeuralNetwork conv_worker;
 	public StructureGenerator struc_worker;
 	public JTextArea textAreaParams;
 	public JLabel lblNewLabel_existindData;
@@ -687,7 +689,7 @@ public class Gui extends JFrame{
 		
 				HashMap<String, String> ausgabe;
 				try {
-					ausgabe = ConvolutionalNeuralNetwork.Try_model(new File(model_path), files);
+					ausgabe = ThreadNet.Try_model(new File(model_path), files);
 					 
 					
 					guiresult = new GuiResult(ausgabe);

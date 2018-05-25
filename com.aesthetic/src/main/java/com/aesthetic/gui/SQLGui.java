@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
@@ -20,9 +22,11 @@ public class SQLGui extends JDialog {
 		
 		try {
 			ClassLoader classLoader = getClass().getClassLoader();
-			File file = new File(classLoader.getResource("flickr_flickr.sql").getFile());
-			BufferedReader buffer = new BufferedReader(new FileReader(file));
+			//File file = new File(classLoader.getResource("flickr_flickr.sql").getFile());
+			InputStream inputStream = classLoader.getResourceAsStream("flickr_flickr.sql");
 			
+			//BufferedReader buffer = new BufferedReader(new FileReader(file));
+			BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream,"UTF-8"));
 			if(buffer != null)
 			{
 				   String line;

@@ -387,60 +387,56 @@ File testset = null;
 	}
 
 	public static HashMap<String, String> Try_model(File model, File[] images) throws Exception {
-		//// LOAD MODEL
-		Nd4j.getRandom().setSeed(12345);
-		MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(model);
-		HashMap<String, String> files = new HashMap<String, String>();
-		List<String> labels = getLabelsFromModelZip(model);
+	//// LOAD MODEL
+			Nd4j.getRandom().setSeed(12345);
+			MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork(model);
+			HashMap<String, String> files = new HashMap<String, String>();
+			List<String> labels = getLabelsFromModelZip(model);
+			String[] classes = labels.toArray(new String[labels.size()]);
+			
+			for (File file : images) {
+				NativeImageLoader loader = new NativeImageLoader(height, width, 3);
+				INDArray image = null;
+				try {
+					
+					image = loader.asMatrix(file);
+					
+				} catch (Exception e) {
+					LOGGER.error("the loader.asMatrix occured an error", e);
+				}
+				// LOGGER.info(network.getLabels().toString());
+				INDArray output = network.output(image);
 
-		if (labels != null) {
-			int counter = 0;
-			for (String s : labels) {
-				files.put("Klasse " + s, " entspricht " + counter);
-				counter++;
+				
+				DataNormalization scaler = new ImagePreProcessingScaler(0,1);
+	            scaler.transform(image);
+	            
+				int[] predict = network.predict(image);
+				String modelResult = "";//"Prediction: ";
+
+				modelResult = modelResult + classes[predict[0]];
+
+				/*
+				 * for(int i = 0; i < predict.length;i++) { if(i < labels.size()) { modelResult
+				 * = modelResult + labels.get(i) + ":"; }
+				 * 
+				 * 
+				 * modelResult = modelResult + predict[i];
+				 * 
+				 * if(i<predict.length-1) { modelResult = modelResult + predict[i] + ";"; }
+				 */
+
+				if (labels == null) {
+					//modelResult = output.toString();
+					//modelResult += "===" + Arrays.toString(predict);
+				}
+				//
+				//
+
+				files.put(file.getPath(), modelResult);
 			}
 
-		}
-
-		for (File file : images) {
-			NativeImageLoader loader = new NativeImageLoader(height, width, 3);
-			INDArray image = null;
-			try {
-				image = loader.asMatrix(file);
-			} catch (Exception e) {
-				LOGGER.error("the loader.asMatrix occured an error", e);
-			}
-			// LOGGER.info(network.getLabels().toString());
-			INDArray output = network.output(image);
-
-			String introduction;
-
-			int[] predict = network.predict(image);
-			String modelResult = "Prediction: ";
-
-			modelResult = modelResult + labels.get(predict[0]);
-
-			/*
-			 * for(int i = 0; i < predict.length;i++) { if(i < labels.size()) { modelResult
-			 * = modelResult + labels.get(i) + ":"; }
-			 * 
-			 * 
-			 * modelResult = modelResult + predict[i];
-			 * 
-			 * if(i<predict.length-1) { modelResult = modelResult + predict[i] + ";"; }
-			 */
-
-			if (labels == null) {
-				modelResult = output.toString();
-				modelResult += "===" + Arrays.toString(predict);
-			}
-			//
-			//
-
-			files.put(file.getPath(), modelResult);
-		}
-
-		return files;
+			return files;
 	}
 
 	public static MultiLayerNetwork alexnetModel(int numLabels) {
