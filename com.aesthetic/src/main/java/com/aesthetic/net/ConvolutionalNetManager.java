@@ -39,6 +39,13 @@ public class ConvolutionalNetManager extends SwingWorker<Void, String> {
 		//*** UNBEDINGT WIEDER ZURÜCKSETZEN
 		int[] tries = new int[] {11,5,8,};
 		
+		if(showinb)
+		{
+			
+			publish("Trainingsprocess can be watched here http://localhost:9000/train/overview");
+			
+		}
+		
 		for (int i = cnn_min; i <= cnn_max; i++) {
 		//	for(int i : tries){
 			for (int x = 0; x <= fcc; x++) {

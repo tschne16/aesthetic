@@ -86,6 +86,20 @@ public static String GetSingleBase64(Long photoid) throws Exception
 	pstmt.close();
 	return s;
 }
+public static boolean testconnection() throws Exception
+{
+	
+	getConnection();
+	
+	String sql = "Select 1 from Dual";
+	PreparedStatement pstmt = conn.prepareStatement(sql);
+	boolean success = pstmt.execute();
+	return success;
+	
+
+
+	
+}
 public static List<AVAHelper> Load_AVA() throws Exception
 {
 	

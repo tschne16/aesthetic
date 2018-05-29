@@ -28,7 +28,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
@@ -107,7 +106,8 @@ public class Gui extends JFrame{
 	private final String prefs_user = "PREFS_USER";
 	private final String prefs_password = "PREFS_PASSWORD";
 	private JTextField textField_password;
-	 
+	private JCheckBox chckbxStore;
+	 private boolean deactivated = false;
 	public Gui() throws Exception {
 		getContentPane().setLayout(null);
 		
@@ -264,12 +264,16 @@ public class Gui extends JFrame{
 		btnCreate.setBounds(338, 7, 89, 23);
 		getContentPane().add(btnCreate);
 		
-		JCheckBox chckbxStore = new JCheckBox("store");
+		chckbxStore = new JCheckBox("store");
 		chckbxStore.addItemListener(new ItemListener() {
 		    @Override
 		    public void itemStateChanged(ItemEvent e) {
 		        if(e.getStateChange() == ItemEvent.SELECTED) {//checkbox has been selected
-		            SavePrefs();
+		            try {
+						SavePrefs();
+					} catch (Exception e1) {
+
+					}
 		            chckbxStore.setSelected(true);
 		        } else {//checkbox has been deselected
 		            //do something...
@@ -635,7 +639,8 @@ public class Gui extends JFrame{
 		panel_4.setBounds(10, 102, 407, 49);
 		panel_2.add(panel_4);
 		panel_4.setLayout(null);
-		
+		panel_4.setEnabled(false);
+		panel_4.setToolTipText("Deactivated due to Framework issues");
 		 rdbtnOwn = new JRadioButton("own Network");
 		rdbtnOwn.setSelected(true);
 		rdbtnOwn.setBounds(6, 19, 109, 23);
@@ -643,10 +648,14 @@ public class Gui extends JFrame{
 		
 		 rdbtnGoogleNet = new JRadioButton("GoogleNet");
 		rdbtnGoogleNet.setBounds(118, 19, 109, 23);
+		rdbtnGoogleNet.setEnabled(false);
+		rdbtnGoogleNet.setToolTipText("Deactivated due to framework issues");
 		panel_4.add(rdbtnGoogleNet);
 		
 		 rdbtnAlexnet = new JRadioButton("AlexNet");
 		rdbtnAlexnet.setBounds(223, 19, 68, 23);
+		rdbtnAlexnet.setEnabled(false);
+		rdbtnAlexnet.setToolTipText("Deactivated due to framework issues");
 		panel_4.add(rdbtnAlexnet);
 		
 		JPanel panel_3 = new JPanel();
@@ -796,7 +805,10 @@ public class Gui extends JFrame{
 		btG.add(rdbtnOwn);
 		
 		 rdbtnKaoEtAl = new JRadioButton("Kao et al.");
+		 rdbtnKaoEtAl.setEnabled(false);
+		 rdbtnKaoEtAl.setToolTipText("Deactivated due to framework issues");
 		rdbtnKaoEtAl.setBounds(293, 19, 109, 23);
+		
 		panel_4.add(rdbtnKaoEtAl);
 		
 		btG.add(rdbtnKaoEtAl);
@@ -819,14 +831,18 @@ public class Gui extends JFrame{
 					batchsize = 15;
 					cnn_max = 5;
 					cnn_min = 1;
+					deactivated = false;
 					return;	
 				}
 				
+				
+					
 					param = new ParamGui(Gui.this,cnn_min,cnn_max,epochs,batchsize);
 					
 					param.setDefaultCloseOperation(param.HIDE_ON_CLOSE);
 					param.setSize(400,400);
 					param.setLocation(140,140);
+					
 					param.setVisible(true);
 					
 					if(param.isSuccess())
@@ -838,10 +854,16 @@ public class Gui extends JFrame{
 						}
 						batchsize = param.getBatchsize();
 						epochs = param.getEpochs();
+				
+						
+						
 					}
 					
 					param.dispose();
+					chckbxparams.setSelected(true);
+					
 				}
+			
 		});
 		
 	
@@ -871,7 +893,13 @@ public class Gui extends JFrame{
 		return result;
 	}
 	
-
+	public void DeletePrefs()
+	{
+		prefs = Preferences.userRoot().node(this.getClass().getName());
+		prefs.remove(prefs_DB);
+		prefs.remove(prefs_password);
+		prefs.remove(prefs_user);	
+	}
 	
 	public void LoadPrefs()
 	{
@@ -896,7 +924,7 @@ public class Gui extends JFrame{
 		new DBHelper("", prefs.get(prefs_password,""), prefs.get(prefs_user , ""), prefs.get(prefs_DB , ""));
 		
 	}
-	public void SavePrefs()
+	public void SavePrefs() throws Exception
 	{
 		prefs = Preferences.userRoot().node(this.getClass().getName());
 		prefs.put(prefs_DB,textField_DBURL.getText());
